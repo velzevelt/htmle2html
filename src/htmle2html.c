@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
+#include <getopt.h>
 
 #define DIR_SEPARATOR '/'
 
@@ -15,57 +17,69 @@ int file_exists(const char *file_name)
     return 0;
 }
 
-char *above(const char path[]) {
-    // iterate from end
-    for (int i = strlen(path) - 1; i >= 0; i--) {
-        char current_char = path[i];
-        int if_eql = strcmp(current_char, DIR_SEPARATOR);
+char *above(const char path[], int above_steps)
+{
+    int path_size = strlen(path);
 
-        printf("\n");
+    // if last char is dir separator we can't go above, so need to return same path
+    if (path_size == 0 || path_size == 1)
+    {
+        return (char *)path;
+    }
+    assert(above_steps > 0);
+
+
+    int dir_separator_id = -1;
+    int above_steps_counter = 1;
+    for (int i = path_size - 1; i >= 1; i--)
+    {
+        if (path[i] == DIR_SEPARATOR)
+        {
+            if (above_steps_counter == above_steps)
+            {
+                dir_separator_id = i;
+                break;
+            } else {
+                above_steps_counter++;
+            }
+        }
     }
 
-    return (char*)path;
+    if (dir_separator_id == -1)
+    {
+        printf("WARNING: no dir separator \"%c\" with steps %i founded in provided path %s\n",
+               DIR_SEPARATOR, above_steps, path);
+        return (char *)path;
+    }
+
+    int res_size = dir_separator_id + 1;
+    char *res = malloc(sizeof(char) * res_size);
+    for (int i = 0; i < res_size - 1; i++)
+    {
+        res[i] = path[i];
+    }
+    res[res_size] = '\0';
+    return res;
 }
 
+int main(int argc, char **argv)
+{
 
-int main(int argc, char **argv) {
-
-    const char test_string[] = "I wanna die";
-    above(test_string);
-    
-    return 0;
-
-
-    FILE *p_file;
+    FILE *file;
     char ch;
 
-    // const char *file_path = "/home/velz/Документы/projects/htmle2html/data/test_1.txt";
     char *exe_path = realpath(argv[0], NULL);
+    char *exe_dir_path = above(exe_path, 1);
     char *file_path;
-    char *root_path;
-    // asprintf(&root_path, "%s/..", exe_path);
-    asprintf(&root_path, "%s/..", exe_path);
-    root_path = realpath(root_path, NULL);
 
-    printf(root_path);
-    printf("\n");
+    printf(exe_dir_path);
+
     return 0;
 
-    asprintf(&file_path, "%s/data/test_1.txt", root_path);
+    file = fopen(file_path, "r");
+    file = fopen(file_path, "r");
 
-    printf(file_path);
-    printf("\n");
-    printf("/home/velz/Документы/projects/htmle2html/data/test_1.txt");
-    printf("\n");
-
-
-    // printf("%i\n", file_exists(file_path));
-    return 0;
-
-    // p_file = fopen(file_path, "r");
-    // p_file = fopen(file_path, "r");
-
-    if (p_file == NULL) 
+    if (file == NULL)
     {
         char *error_message;
         asprintf(&error_message, "Can't open file at %s", file_path);
@@ -74,14 +88,15 @@ int main(int argc, char **argv) {
     }
 
     printf("content of this file are \n");
- 
-    do {
-        ch = fgetc(p_file);
+
+    do
+    {
+        ch = fgetc(file);
         printf("%c", ch);
     } while (ch != EOF);
- 
+
     printf("\n");
-    fclose(p_file);
+    fclose(file);
 
     return 0;
 }
