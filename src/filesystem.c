@@ -82,86 +82,88 @@ char *above(const char path[], int above_steps)
 struct dir_info
 {
     char **files;
-    char **directoris;
     size_t length;
 };
 
+
+struct dir_info get_dir_files_of_type(char *path, int (*condition)(struct dirent*))
+{
+    DIR *d = opendir(path);
+    if (d == NULL)
+    {
+        perror("No such directory");
+        struct dir_info r = {};
+        return r;
+    }
+
+    struct dirent *dir;
+    int files_length = 0;
+    while ((dir = readdir(d)) != NULL)
+    {
+        // if (dir->d_type == d_type)
+        // {
+        //     files_length++;
+        // }
+
+        if (condition(dir))
+        {
+            files_length++;
+        }
+
+    }
+    rewinddir(d);
+
+    int i = 0;
+    char **files = calloc(files_length, sizeof(char*));
+    int path_size = strlen(path);
+    while ((dir = readdir(d)) != NULL)
+    {
+        if (condition(dir))
+        {
+            int file_name_size = strlen(dir->d_name);
+            files[i] = calloc(file_name_size + path_size + 2, sizeof(char*));
+            strncat(files[i], path, path_size);
+            files[i][path_size] = DIR_SEPARATOR;
+            strncat(files[i], dir->d_name, file_name_size);
+            i++;
+        }
+    }
+    closedir(d);
+
+    struct dir_info res = {files, files_length};
+    return res;
+}
+
+
 // https://stackoverflow.com/questions/4204666/how-to-list-files-in-a-directory-in-a-c-program
 struct dir_info get_dir_files(char *path)
-{
-    DIR *d = opendir(path);
-    if (d == NULL)
+{   
+    int con(struct dirent *dir)
     {
-        perror("No such directory");
-        struct dir_info r = {};
-        return r;
+        return dir->d_type == DT_REG;
     }
 
-    struct dirent *dir;
-    int files_length = 0;
-    while ((dir = readdir(d)) != NULL)
-    {
-        if (dir->d_type == DT_REG)
-        {
-            files_length++;
-        }
-    }
-    rewinddir(d);
-
-    int i = 0;
-    char *files[files_length];
-    while ((dir = readdir(d)) != NULL)
-    {
-        if (dir->d_type == DT_REG)
-        {
-            files[i] = (char *)malloc(strlen(dir->d_name) + 1);
-            strncpy(files[i], dir->d_name, strlen(dir->d_name));
-            i++;
-        }
-    }
-    closedir(d);
-
-    struct dir_info res = {files, files_length};
-    return res;
+    return get_dir_files_of_type(path, con);
 }
 
-struct dir_info get_dir_files_rec(char *path)
+struct dir_info get_dir_dir(char *path)
 {
-    DIR *d = opendir(path);
-    if (d == NULL)
+    int con(struct dirent *dir)
     {
-        perror("No such directory");
-        struct dir_info r = {};
-        return r;
+        return dir->d_type == DT_DIR && strncmp(dir->d_name, ".", 1) != 0 && strncmp(dir->d_name, "..", 2) != 0;
     }
 
-    struct dirent *dir;
-    int files_length = 0;
-    while ((dir = readdir(d)) != NULL)
-    {
-        if (dir->d_type == DT_REG)
-        {
-            files_length++;
-        }
-    }
-    rewinddir(d);
 
-    int i = 0;
-    char *files[files_length];
-    while ((dir = readdir(d)) != NULL)
-    {
-        if (dir->d_type == DT_REG)
-        {
-            files[i] = (char *)malloc(strlen(dir->d_name) + 1);
-            strncpy(files[i], dir->d_name, strlen(dir->d_name));
-            i++;
-        }
-    }
-    closedir(d);
-
-    struct dir_info res = {files, files_length};
-    return res;
+    return get_dir_files_of_type(path, con);
+    // Get list of dir
+    // Get full list of dir
+    // Get all files
 }
+
+// struct dir_info get_dir_files_rec(cont char path[])
+// {
+
+// }
 
 
 

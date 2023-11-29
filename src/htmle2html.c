@@ -16,13 +16,27 @@
 int main(int argc, char **argv)
 {
     char *cwd = current_dir_path(argv[0]);
+    struct dir_info d = get_dir_files(cwd);
 
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < d.length; i++)
     {
-        int count = count_dir_files(cwd);
-        printf("Count files in %s\n", cwd);
-        printf("Count: %i\n", count);
-        sleep(15);
+        printf("%s\n", d.files[i]);
     }
+
+    struct dir_info d2 = get_dir_dir(cwd);
+
+    for (int i = 0; i < d2.length; i++)
+    {
+        printf("%s\n", d2.files[i]);
+    }
+
+
+    // for (int i = 0; i < 50; i++)
+    // {
+    //     int count = count_dir_files(cwd);
+    //     printf("Count files in %s\n", cwd);
+    //     printf("Count: %i\n", count);
+    //     sleep(15);
+    // }
 
 }
