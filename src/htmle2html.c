@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <getopt.h>
+
+#if defined(WIN32)
+#include <asprintf.h>
+#endif
 
 #define DIR_SEPARATOR '/'
 
@@ -47,24 +50,20 @@ char *above(const char path[], int above_steps)
 
     if (dir_separator_id == -1)
     {
-        printf("WARNING: no dir separator \"%c\" with steps %i founded in provided path %s\n",
+        printf("WARNING: no dir separator \"%c\" with steps %i found in provided path %s\n",
                DIR_SEPARATOR, above_steps, path);
         return (char *)path;
     }
 
     int res_size = dir_separator_id + 1;
     char *res = malloc(sizeof(char) * res_size);
-    for (int i = 0; i < res_size - 1; i++)
-    {
-        res[i] = path[i];
-    }
+    strncpy(res, path, res_size - 1);
     res[res_size] = '\0';
     return res;
 }
 
 int main(int argc, char **argv)
 {
-
     FILE *file;
     char ch;
 
@@ -72,31 +71,31 @@ int main(int argc, char **argv)
     char *exe_dir_path = above(exe_path, 1);
     char *file_path;
 
-    printf(exe_dir_path);
+    printf("\n%i\n", file_exists(file_path));
 
     return 0;
 
-    file = fopen(file_path, "r");
-    file = fopen(file_path, "r");
 
-    if (file == NULL)
-    {
-        char *error_message;
-        asprintf(&error_message, "Can't open file at %s", file_path);
-        perror(error_message);
-        return 1;
-    }
+    // file = fopen(file_path, "r");
 
-    printf("content of this file are \n");
+    // if (file == NULL)
+    // {   
+    //     char *error_message;
+    //     asprintf(&error_message, "Can't open file at %s", file_path);
+    //     perror(error_message);
+    //     return 1;
+    // }
 
-    do
-    {
-        ch = fgetc(file);
-        printf("%c", ch);
-    } while (ch != EOF);
+    // printf("content of this file are \n");
 
-    printf("\n");
-    fclose(file);
+    // do
+    // {
+    //     ch = fgetc(file);
+    //     printf("%c", ch);
+    // } while (ch != EOF);
 
-    return 0;
+    // printf("\n");
+    // fclose(file);
+
+    // return 0;
 }
