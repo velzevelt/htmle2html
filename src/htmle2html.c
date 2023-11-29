@@ -64,8 +64,8 @@ char *above(const char path[], int above_steps)
     return res;
 }
 
-
-struct dir_info {
+struct dir_info
+{
     char **files;
     size_t length;
 };
@@ -84,11 +84,7 @@ struct dir_info get_dir_files(char *path)
     int files_length = 0;
     while ((dir = readdir(d)) != NULL)
     {
-        if (dir->d_type == DT_DIR)
-        {
-            continue;
-        }
-        else
+        if (dir->d_type == DT_REG)
         {
             files_length++;
         }
@@ -99,16 +95,12 @@ struct dir_info get_dir_files(char *path)
     char *files[files_length];
     while ((dir = readdir(d)) != NULL)
     {
-        if (dir->d_type == DT_DIR)
-        {
-            continue;
-        }
-        else
+        if (dir->d_type == DT_REG)
         {
             files[i] = (char *)malloc(strlen(dir->d_name) + 1);
             strncpy(files[i], dir->d_name, strlen(dir->d_name));
+            i++;
         }
-        i++;
     }
     closedir(d);
 
@@ -120,12 +112,8 @@ int main(int argc, char **argv)
 {
     char *exe_path = realpath(argv[0], NULL);
     char *exe_dir_path = above(exe_path, 1);
-    struct dir_info test = get_dir_files(exe_dir_path);
-
-    for (int i = 0; i < test.length; i++) {
-        printf("%s\n", test.files[i]);
-    }
-    return 0;
+    struct dir_info bin_dir = get_dir_files(exe_dir_path);
+    
 
     // char *file_path;
 
