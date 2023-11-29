@@ -1,5 +1,5 @@
 linux:
-	gcc ./src/htmle2html.c -o ./bin/htmle2html -Wall -Wextra -g
+	gcc -I ./src/ ./src/htmle2html.c -o ./bin/htmle2html -Wall -Wextra -g
 
 
 windows-cygwin:
