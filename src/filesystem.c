@@ -183,23 +183,11 @@ void append_files(struct dir_info *self, struct dir_info *other)
     self->length = new_size;
 }
 
-struct dir_info get_dir_dir_rec(const char path[])
+struct dir_info get_dir_dir_rec(const char path[], struct dir_info accum)
 {
     struct dir_info total_dir;
     total_dir.length = 0;
-
     struct dir_info current_dir = get_dir_dir(path);
-
-    if (current_dir.length == 0)
-    {
-        append_files(&total_dir, current_dir);
-        return total_dir;
-    }
-    else
-    {
-        
-    }
-
 }
 
 
