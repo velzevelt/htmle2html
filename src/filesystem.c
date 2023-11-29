@@ -154,24 +154,33 @@ struct dir_info get_dir_dir(char *path)
     // Get all files
 }
 
-void free_files(char **files, int size)
+void free_files(char *files[], int size)
 {
     for (int i = 0; i < size; i++)
         free(files[i]);
     free(files);
 }
 
-void append_files(struct dir_info self, struct dir_info other)
+void append_files(struct dir_info *self, struct dir_info *other)
 {
-    int new_size = self.length + other.length;
+    int new_size = self->length + other->length;
     char **new_files = calloc(new_size, sizeof(char**));
-    memcpy(new_files, self.files, self.length);
-    memcpy(new_files[self.length], other.files, other.length);
 
-    free_files(self.files);
-    self.files = new_files;
-    self.length = new_size;
-    return self;
+    for (int i = 0; i < self->length; i++)
+    {
+        new_files[i] = calloc(strlen(self->files[i]), sizeof(self->files[i]));
+        strncpy(new_files[i], self->files[i], strlen(self->files[i]));
+    }
+
+    for (int i = self->length, j = 0; i < new_size; i++, j++)
+    {
+        new_files[i] = calloc(strlen(other->files[j]), sizeof(other->files[j]));
+        strncpy(new_files[i], other->files[j], strlen(other->files[j]));
+    }
+
+    free_files(self.files, self->length);
+    self->files = new_files;
+    self->length = new_size;
 }
 
 // struct dir_info get_dir_dir_rec(const char path[])

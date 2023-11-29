@@ -30,6 +30,13 @@ int main(int argc, char **argv)
         printf("%s\n", d2.files[i]);
     }
 
+    append_files(&d2, &d);
+
+    printf("AFTER APPEND size %i\n", d2.length);
+    for (int i = 0; i < d2.length; i++)
+    {
+        printf("%s\n", d2.files[i]);
+    }
 
 
     // for (int i = 0; i < 50; i++)
