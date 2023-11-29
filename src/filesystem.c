@@ -178,27 +178,29 @@ void append_files(struct dir_info *self, struct dir_info *other)
         strncpy(new_files[i], other->files[j], strlen(other->files[j]));
     }
 
-    free_files(self.files, self->length);
+    free_files(self->files, self->length);
     self->files = new_files;
     self->length = new_size;
 }
 
-// struct dir_info get_dir_dir_rec(const char path[])
-// {
-//     struct dir_info total_dir = calloc(50, sizeof(struct dir_info));
-//     struct dir_info current_dir = get_dir_dir(path);
+struct dir_info get_dir_dir_rec(const char path[])
+{
+    struct dir_info total_dir;
+    total_dir.length = 0;
 
-//     if (current_dir.length == 0)
-//     {
+    struct dir_info current_dir = get_dir_dir(path);
 
-//         return total_dir;
-//     }
-//     else
-//     {
+    if (current_dir.length == 0)
+    {
+        append_files(&total_dir, current_dir);
+        return total_dir;
+    }
+    else
+    {
+        
+    }
 
-//     }
-
-// }
+}
 
 
 
