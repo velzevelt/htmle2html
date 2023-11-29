@@ -100,21 +100,15 @@ struct dir_info get_dir_files_of_type(char *path, int (*condition)(struct dirent
     int files_length = 0;
     while ((dir = readdir(d)) != NULL)
     {
-        // if (dir->d_type == d_type)
-        // {
-        //     files_length++;
-        // }
-
         if (condition(dir))
         {
             files_length++;
         }
-
     }
     rewinddir(d);
 
     int i = 0;
-    char **files = calloc(files_length, sizeof(char*));
+    char **files = calloc(files_length, sizeof(char**));
     int path_size = strlen(path);
     while ((dir = readdir(d)) != NULL)
     {
@@ -160,8 +154,40 @@ struct dir_info get_dir_dir(char *path)
     // Get all files
 }
 
-// struct dir_info get_dir_files_rec(cont char path[])
+void free_files(char **files, int size)
+{
+    for (int i = 0; i < size; i++)
+        free(files[i]);
+    free(files);
+}
+
+void append_files(struct dir_info self, struct dir_info other)
+{
+    int new_size = self.length + other.length;
+    char **new_files = calloc(new_size, sizeof(char**));
+    memcpy(new_files, self.files, self.length);
+    memcpy(new_files[self.length], other.files, other.length);
+
+    free_files(self.files);
+    self.files = new_files;
+    self.length = new_size;
+    return self;
+}
+
+// struct dir_info get_dir_dir_rec(const char path[])
 // {
+//     struct dir_info total_dir = calloc(50, sizeof(struct dir_info));
+//     struct dir_info current_dir = get_dir_dir(path);
+
+//     if (current_dir.length == 0)
+//     {
+
+//         return total_dir;
+//     }
+//     else
+//     {
+
+//     }
 
 // }
 
