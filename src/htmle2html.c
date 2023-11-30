@@ -36,14 +36,10 @@ int main(int argc, char **argv)
                 char *file_content = get_file_contents(f);
                 printf("file content:\n%s\n", file_content);
 
-                for (int i = 0; i < strlen(file_content); i++)
+                char *contain;
+                if (contain = strstr(file_content, "<?e"))
                 {
-                    char ch = file_content[i];
-                    if (ch == '<' && file_content[i + 1] == '?' && file_content[i + 2] == 'e')
-                    {
-                        printf("Find htmle thingy at %i\n");
-                    }
-
+                    printf("contains thingy, size of line %i\n", get_line_length(contain));
                 }
 
 

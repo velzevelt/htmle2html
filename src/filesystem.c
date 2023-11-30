@@ -278,3 +278,19 @@ char *get_file_contents(FILE *f)
 
     return buffer;
 }
+
+
+int get_line_length(char *line)
+{
+    int absolute_line_length = strlen(line);
+    for (int i = 0; i < absolute_line_length; i++)
+    {
+        char ch = line[i];
+        if (ch == '\n')
+        {
+            return i;
+        }
+    }
+
+    return 0;
+}
