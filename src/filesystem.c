@@ -50,7 +50,7 @@ char *change_file_extension(const char file_path[], const char new_extension[])
     int old_extension_size = strlen(old_extension);
     int new_extension_size = strlen(new_extension);
 
-    char *new_file_path = calloc(path_size - old_extension_size + new_extension_size, sizeof(char));
+    char *new_file_path = calloc(path_size - old_extension_size + new_extension_size + 1, sizeof(char));
 
                                                                                                 // path_file.old_extension
     strncpy(new_file_path, file_path, path_size - old_extension_size);                          // path_file.
