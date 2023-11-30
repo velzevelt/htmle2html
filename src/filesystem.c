@@ -13,7 +13,7 @@ int file_exists_at_path(const char *file_name)
 
 int file_exists_file(FILE *file)
 {
-    return file != NULL; 
+    return file != NULL;
 }
 
 char *get_file_extension(const char file_path[])
@@ -44,15 +44,15 @@ char *get_file_extension(const char file_path[])
 
 char *change_file_extension(const char file_path[], const char new_extension[])
 {
-    int path_size = strlen(file_path); 
-    
+    int path_size = strlen(file_path);
+
     char *old_extension = get_file_extension(file_path);
     int old_extension_size = strlen(old_extension);
     int new_extension_size = strlen(new_extension);
 
     char *new_file_path = calloc(path_size - old_extension_size + new_extension_size + 1, sizeof(char));
 
-                                                                                                // path_file.old_extension
+    // path_file.old_extension
     strncpy(new_file_path, file_path, path_size - old_extension_size);                          // path_file.
     strncpy(&new_file_path[path_size - old_extension_size], new_extension, new_extension_size); // path_file.new_extension
     return new_file_path;
@@ -82,8 +82,6 @@ int file_has_extension(const char file_path[], const char extension[])
     int res = strncmp(chunk, extension, extension_size);
     return res;
 }
-
-
 
 char *above(const char path[], int above_steps)
 {
@@ -134,8 +132,7 @@ struct dir_info
     size_t length;
 };
 
-
-struct dir_info get_dir_files_of_type(char *path, int (*condition)(struct dirent*))
+struct dir_info get_dir_files_of_type(char *path, int (*condition)(struct dirent *))
 {
     DIR *d = opendir(path);
     if (d == NULL)
@@ -157,14 +154,14 @@ struct dir_info get_dir_files_of_type(char *path, int (*condition)(struct dirent
     rewinddir(d);
 
     int i = 0;
-    char **files = calloc(files_length, sizeof(char**));
+    char **files = calloc(files_length, sizeof(char **));
     int path_size = strlen(path);
     while ((dir = readdir(d)) != NULL)
     {
         if (condition(dir))
         {
             int file_name_size = strlen(dir->d_name);
-            files[i] = calloc(file_name_size + path_size + 2, sizeof(char*));
+            files[i] = calloc(file_name_size + path_size + 2, sizeof(char *));
             strncat(files[i], path, path_size);
             files[i][path_size] = DIR_SEPARATOR;
             strncat(files[i], dir->d_name, file_name_size);
@@ -177,11 +174,10 @@ struct dir_info get_dir_files_of_type(char *path, int (*condition)(struct dirent
     return res;
 }
 
-
 // https://stackoverflow.com/questions/4204666/how-to-list-files-in-a-directory-in-a-c-program
 struct dir_info get_dir_files(char *path)
-{   
-    int con(struct dirent *dir)
+{
+    int con(struct dirent * dir)
     {
         return dir->d_type == DT_REG;
     }
@@ -191,11 +187,10 @@ struct dir_info get_dir_files(char *path)
 
 struct dir_info get_dir_dir(char *path)
 {
-    int con(struct dirent *dir)
+    int con(struct dirent * dir)
     {
         return dir->d_type == DT_DIR && strncmp(dir->d_name, ".", 1) != 0 && strncmp(dir->d_name, "..", 2) != 0;
     }
-
 
     return get_dir_files_of_type(path, con);
     // Get list of dir
@@ -213,7 +208,7 @@ void free_files(char *files[], int size)
 void append_files(struct dir_info *self, struct dir_info *other)
 {
     int new_size = self->length + other->length;
-    char **new_files = calloc(new_size, sizeof(char**));
+    char **new_files = calloc(new_size, sizeof(char **));
 
     for (int i = 0; i < self->length; i++)
     {
@@ -239,8 +234,6 @@ void append_files(struct dir_info *self, struct dir_info *other)
 //     struct dir_info current_dir = get_dir_dir(path);
 // }
 
-
-
 int count_dir_files(const char path[])
 {
     DIR *d = opendir(path);
@@ -264,10 +257,24 @@ int count_dir_files(const char path[])
     return files_length;
 }
 
-
 char *current_dir_path(char *arg_0)
 {
     char *exe_path = realpath(arg_0, NULL);
     char *exe_dir_path = above(exe_path, 1);
     return exe_dir_path;
+}
+
+char *get_file_contents(FILE *f)
+{
+    fseek(f, 0, SEEK_END);
+    long length = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    char *buffer = malloc(length);
+
+    if (buffer)
+    {
+        fread(buffer, 1, length, f);
+    }
+
+    return buffer;
 }

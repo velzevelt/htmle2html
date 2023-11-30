@@ -26,7 +26,7 @@ int main(int argc, char **argv)
     for (int i = 1; i < cwd_dir_info.length; i++)
     {   
         char *file_path = cwd_dir_info.files[i]; 
-        FILE *f = fopen(file_path, "r");
+        FILE *f = fopen(file_path, "rb");
 
         if (file_exists_file(f))
         {
@@ -37,9 +37,11 @@ int main(int argc, char **argv)
                 char *new_file_path = change_file_extension(file_path, "html");
                 printf("Changing file extension\nOld path: %s\nNew path: %s\n", file_path, new_file_path);
 
-                FILE *new_file = fopen(new_file_path, "w");
-                fprintf(new_file, "Writing to file");
+                // FILE *new_file = fopen(new_file_path, "w");
+                // fprintf(new_file, "Writing to file");
 
+                char *file_content = get_file_contents(f);
+                printf("file content:\n%s\n", file_content);
             }
 
             fclose(f);
