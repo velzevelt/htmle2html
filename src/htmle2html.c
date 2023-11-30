@@ -34,12 +34,50 @@ int main(int argc, char **argv)
 
                 
                 char *file_content = get_file_contents(f);
-                printf("file content:\n%s\n", file_content);
+                // printf("file content:\n%s\n", file_content);
 
                 char *contain;
                 if (contain = strstr(file_content, "<?e"))
-                {
-                    printf("contains thingy %s, size of line %i\n", contain, get_line_length(contain));
+                {   
+                    int substring_size = get_line_length(contain);
+                    char substring[substring_size];
+
+                    strncpy(substring, contain, substring_size);
+                    substring[substring_size] = '\0';
+
+                    char *command;
+                    if (command = strstr(substring, "include"))
+                    {
+                        char *arg_begin;
+                        char *arg_end;
+
+                        arg_begin = strstr(command, "(\"");
+                        arg_end = strstr(command, "\")");
+
+                        arg_begin += 2;
+                        arg_end--;
+
+                        int size_between = 0;
+                        for (int i = 0; i < substring_size; i++)
+                        {
+                            char j = arg_begin[i];
+
+                            printf("current symbol %c\n", j);
+                            printf("arg_end symbol %c\n", arg_end[0]);
+
+                            if (j == arg_end[0])
+                            {
+                                size_between = i + 1;
+                                break;
+                            }
+                        }
+
+                        printf("size between arg_start and arg_end is %i\n", size_between);
+
+                        char *arg[substring_size];
+                        // strncpy(arg, arg_begin, );
+                    }
+
                 }
 
 
