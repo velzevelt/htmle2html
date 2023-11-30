@@ -14,37 +14,46 @@
 
 
 int main(int argc, char **argv)
-{
-    char *cwd = current_dir_path(argv[0]);
-    struct dir_info d = get_dir_files(cwd);
+{   
+    char *test_path = "test_path.exe";
+    char *t2 = change_file_extension(test_path, "tuareg");
 
-    for (int i = 0; i < d.length; i++)
+    for (int i = 0; i < strlen(t2); i++)
     {
-        printf("%s\n", d.files[i]);
-    }
-
-    struct dir_info d2 = get_dir_dir(cwd);
-
-    for (int i = 0; i < d2.length; i++)
-    {
-        printf("%s\n", d2.files[i]);
-    }
-
-    append_files(&d2, &d);
-
-    printf("AFTER APPEND size %i\n", d2.length);
-    for (int i = 0; i < d2.length; i++)
-    {
-        printf("%s\n", d2.files[i]);
+        printf("%c\n", t2[i]);
     }
 
 
-    // for (int i = 0; i < 50; i++)
-    // {
-    //     int count = count_dir_files(cwd);
-    //     printf("Count files in %s\n", cwd);
-    //     printf("Count: %i\n", count);
-    //     sleep(15);
+    // char *cwd = current_dir_path(argv[0]);
+    // struct dir_info cwd_dir_info = get_dir_files(cwd);
+
+    // for (int i = 1; i < cwd_dir_info.length; i++)
+    // {   
+    //     char *file_path = cwd_dir_info.files[i]; 
+    //     FILE *f = fopen(file_path, "r");
+
+    //     if (file_exists_file(f))
+    //     {
+    //         char *file_extension = get_file_extension(file_path);
+
+    //         if (strncmp(file_extension, "htmle", 5) == 0)
+    //         {
+    //             char *new_file_path = change_file_extension(file_path, "html");
+
+                
+    //         }
+
+    //         fclose(f);
+    //     }
+    //     else
+    //     {
+    //         fprintf(stderr, "File does not exist at path %s\n", file_path);
+    //     }
+
     // }
+
+
+
+
 
 }

@@ -1,6 +1,6 @@
 #define DIR_SEPARATOR '/'
 
-int file_exists(const char *file_name)
+int file_exists_at_path(const char *file_name)
 {
     FILE *file;
     if ((file = fopen(file_name, "r")))
@@ -9,6 +9,53 @@ int file_exists(const char *file_name)
         return 1;
     }
     return 0;
+}
+
+int file_exists_file(FILE *file)
+{
+    return file != NULL; 
+}
+
+char *get_file_extension(const char file_path[])
+{
+    int path_size = strlen(file_path);
+    int dot_pos = -1;
+
+    for (int i = 0; i < path_size; i++)
+    {
+        char item = file_path[i];
+        if (item == '.')
+        {
+            dot_pos = i;
+            break;
+        }
+    }
+
+    if (dot_pos != -1)
+    {
+        return &file_path[dot_pos + 1];
+    }
+    else
+    {
+        fprintf(stderr, "Fail to get file extension at path %s\n", file_path);
+        return NULL;
+    }
+}
+
+char *change_file_extension(const char file_path[], const char new_extension[])
+{
+    int path_size = strlen(file_path); 
+    
+    char *old_extension = get_file_extension(file_path);
+    int old_extension_size = strlen(old_extension);
+    int new_extension_size = strlen(new_extension);
+
+    char *new_file_path = calloc(path_size - old_extension_size + new_extension_size, sizeof(char));
+
+                                                                                                // path_file.old_extension
+    strncpy(new_file_path, file_path, path_size - old_extension_size);                          // path_file.
+    strncpy(&new_file_path[path_size - old_extension_size], new_extension, new_extension_size); // path_file.new_extension
+    return new_file_path;
 }
 
 int file_has_extension(const char file_path[], const char extension[])
@@ -35,6 +82,8 @@ int file_has_extension(const char file_path[], const char extension[])
     int res = strncmp(chunk, extension, extension_size);
     return res;
 }
+
+
 
 char *above(const char path[], int above_steps)
 {
@@ -183,12 +232,12 @@ void append_files(struct dir_info *self, struct dir_info *other)
     self->length = new_size;
 }
 
-struct dir_info get_dir_dir_rec(const char path[], struct dir_info accum)
-{
-    struct dir_info total_dir;
-    total_dir.length = 0;
-    struct dir_info current_dir = get_dir_dir(path);
-}
+// struct dir_info get_dir_dir_rec(const char path[], struct dir_info accum)
+// {
+//     struct dir_info total_dir;
+//     total_dir.length = 0;
+//     struct dir_info current_dir = get_dir_dir(path);
+// }
 
 
 
