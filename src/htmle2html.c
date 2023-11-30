@@ -66,6 +66,26 @@ int main(int argc, char **argv)
                         arg[size_between + 1] = '\0';
 
                         printf("parsed arg is %s\n", arg);
+                        FILE *include_file = fopen(arg, "rb");
+
+                        if (file_exists_file(include_file))
+                        {
+                            char *include_content = get_file_contents(include_file);
+                            // printf("Include content is %s\n", include_content);
+
+                            char *new_file_content = calloc(strlen(file_content) + strlen(include_content) + 10, sizeof(char));
+                            strncpy(new_file_content, file_content, strlen(file_content));
+                            strncpy(&new_file_content[strlen(file_content)], include_content, strlen(include_content));
+
+                            printf("New file content is %s\n", new_file_content);
+
+                            fclose(include_file);
+                        }
+                        else
+                        {
+                            fprintf(stderr, "Can't find file: %s, cwd: %s\n", arg, cwd);
+                        }
+
                     }
 
                 }
