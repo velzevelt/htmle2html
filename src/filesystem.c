@@ -288,7 +288,7 @@ int get_line_length(char *line)
         char ch = line[i];
         if (ch == '\n')
         {
-            return i;
+            return i - 1;
         }
     }
 

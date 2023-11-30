@@ -39,7 +39,7 @@ int main(int argc, char **argv)
                 char *contain;
                 if (contain = strstr(file_content, "<?e"))
                 {
-                    printf("contains thingy, size of line %i\n", get_line_length(contain));
+                    printf("contains thingy %s, size of line %i\n", contain, get_line_length(contain));
                 }
 
 
