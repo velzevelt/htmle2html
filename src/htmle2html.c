@@ -57,25 +57,15 @@ int main(int argc, char **argv)
                         arg_begin += 2;
                         arg_end--;
 
-                        int size_between = 0;
-                        for (int i = 0; i < substring_size; i++)
-                        {
-                            char j = arg_begin[i];
-
-                            printf("current symbol %c\n", j);
-                            printf("arg_end symbol %c\n", arg_end[0]);
-
-                            if (j == arg_end[0])
-                            {
-                                size_between = i + 1;
-                                break;
-                            }
-                        }
+                        int size_between = arg_end - arg_begin + 1;
 
                         printf("size between arg_start and arg_end is %i\n", size_between);
 
-                        char *arg[substring_size];
-                        // strncpy(arg, arg_begin, );
+                        char arg[size_between + 1];
+                        strncpy(arg, arg_begin, size_between);
+                        arg[size_between + 1] = '\0';
+
+                        printf("parsed arg is %s\n", arg);
                     }
 
                 }
