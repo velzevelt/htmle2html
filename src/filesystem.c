@@ -16,7 +16,7 @@ int file_exists_file(FILE *file)
     return file != NULL;
 }
 
-char *get_file_extension(const char file_path[])
+const char *get_file_extension(const char file_path[])
 {
     int path_size = strlen(file_path);
     int dot_pos = -1;
@@ -75,15 +75,12 @@ int file_has_extension(const char file_path[], const char extension[])
     }
 
     char chunk[extension_size];
-    for (int i = dot_pos + 1, j = 0; i < path_size; i++, j++)
-    {
-        chunk[j] = file_path[i];
-    }
+    strncpy(chunk, &file_path[dot_pos + 1], extension_size);
     int res = strncmp(chunk, extension, extension_size);
     return res;
 }
 
-char *above(const char path[], int above_steps)
+const char *above(const char path[], int above_steps)
 {
     int path_size = strlen(path);
 
@@ -126,19 +123,20 @@ char *above(const char path[], int above_steps)
     return res;
 }
 
-struct dir_info
+typedef struct
 {
     char **files;
     size_t length;
-};
 
-struct dir_info get_dir_files_of_type(char *path, int (*condition)(struct dirent *))
+} dir_info;
+
+dir_info get_dir_files_of_type(char *path, int (*condition)(struct dirent *))
 {
     DIR *d = opendir(path);
     if (d == NULL)
     {
         perror("No such directory");
-        struct dir_info r = {};
+        dir_info r = {};
         return r;
     }
 
@@ -153,29 +151,33 @@ struct dir_info get_dir_files_of_type(char *path, int (*condition)(struct dirent
     }
     rewinddir(d);
 
-    int i = 0;
-    char **files = calloc(files_length, sizeof(char **));
-    int path_size = strlen(path);
-    while ((dir = readdir(d)) != NULL)
+    char **_files;
+    if (files_length > 0)
     {
-        if (condition(dir))
+        int i = 0;
+        char **files = malloc(files_length * sizeof(char **));
+        int path_size = strlen(path);
+        while ((dir = readdir(d)) != NULL)
         {
-            int file_name_size = strlen(dir->d_name);
-            files[i] = calloc(file_name_size + path_size + 2, sizeof(char *));
-            strncat(files[i], path, path_size);
-            files[i][path_size] = DIR_SEPARATOR;
-            strncat(files[i], dir->d_name, file_name_size);
-            i++;
+            if (condition(dir))
+            {
+                int file_name_size = strlen(dir->d_name);
+                files[i] = calloc(file_name_size + path_size + 1, sizeof(char));
+                strncat(files[i], path, path_size);             // path
+                files[i][path_size] = DIR_SEPARATOR;            // path/
+                strncat(files[i], dir->d_name, file_name_size); // path/file_name
+                i++;
+            }
         }
+        _files = files;
     }
-    closedir(d);
 
-    struct dir_info res = {files, files_length};
+    closedir(d);
+    dir_info res = {_files, files_length};
     return res;
 }
 
-// https://stackoverflow.com/questions/4204666/how-to-list-files-in-a-directory-in-a-c-program
-struct dir_info get_dir_files(char *path)
+dir_info get_dir_files(char *path)
 {
     int con(struct dirent * dir)
     {
@@ -185,54 +187,73 @@ struct dir_info get_dir_files(char *path)
     return get_dir_files_of_type(path, con);
 }
 
-struct dir_info get_dir_dir(char *path)
+dir_info get_dir_dir(char *path)
 {
     int con(struct dirent * dir)
     {
         return dir->d_type == DT_DIR && strncmp(dir->d_name, ".", 1) != 0 && strncmp(dir->d_name, "..", 2) != 0;
     }
-
     return get_dir_files_of_type(path, con);
-    // Get list of dir
-    // Get full list of dir
-    // Get all files
 }
 
-void free_files(char *files[], int size)
+void free_files(char **files, int size)
 {
     for (int i = 0; i < size; i++)
         free(files[i]);
     free(files);
 }
 
-void append_files(struct dir_info *self, struct dir_info *other)
+void free_dir_info(dir_info *d)
+{
+    free_files(d->files, d->length);
+}
+
+void append_files(dir_info *self, const dir_info *other)
 {
     int new_size = self->length + other->length;
     char **new_files = calloc(new_size, sizeof(char **));
 
     for (int i = 0; i < self->length; i++)
     {
-        new_files[i] = calloc(strlen(self->files[i]), sizeof(self->files[i]));
-        strncpy(new_files[i], self->files[i], strlen(self->files[i]));
+        int t = strlen(self->files[i]);
+        new_files[i] = malloc(sizeof(self->files[0]) * t);
+        strncpy(new_files[i], self->files[i], t + 1);
     }
 
     for (int i = self->length, j = 0; i < new_size; i++, j++)
     {
-        new_files[i] = calloc(strlen(other->files[j]), sizeof(other->files[j]));
-        strncpy(new_files[i], other->files[j], strlen(other->files[j]));
+        int t = strlen(other->files[j]);
+        new_files[i] = malloc(sizeof(other->files[j]) * t);
+        strncpy(new_files[i], other->files[j], t + 1);
     }
 
-    free_files(self->files, self->length);
+    free_dir_info(self);
     self->files = new_files;
     self->length = new_size;
 }
 
-// struct dir_info get_dir_dir_rec(const char path[], struct dir_info accum)
-// {
-//     struct dir_info total_dir;
-//     total_dir.length = 0;
-//     struct dir_info current_dir = get_dir_dir(path);
-// }
+/**
+ * Return information about all files in directory and their subdirectories
+ * include_subdir -> Include subdirectories to the final result?
+ */
+dir_info get_dir_files_rec(const char path[])
+{
+    dir_info files = get_dir_files(path);
+    dir_info directories = get_dir_dir(path);
+
+    for (int i = 0; i < directories.length; i++)
+    {
+        const char *p2 = directories.files[i];
+        // printf("A %s\n", p2);
+
+        dir_info files_2 = get_dir_files_rec(p2);
+
+        // printf("files_2 len: %i\n", files_2.length);
+        append_files(&files, &files_2);
+    }
+
+    return files;
+}
 
 int count_dir_files(const char path[])
 {
@@ -257,7 +278,7 @@ int count_dir_files(const char path[])
     return files_length;
 }
 
-char *current_dir_path(char *arg_0)
+char *exe_dir_path(char *arg_0)
 {
     char *exe_path = realpath(arg_0, NULL);
     char *exe_dir_path = above(exe_path, 1);
@@ -278,7 +299,6 @@ char *get_file_contents(FILE *f)
 
     return buffer;
 }
-
 
 int get_line_length(char *line)
 {

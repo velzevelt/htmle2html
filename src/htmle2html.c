@@ -15,12 +15,12 @@
 
 int main(int argc, char **argv)
 {   
-    char *cwd = current_dir_path(argv[0]);
-    struct dir_info cwd_dir_info = get_dir_files(cwd);
+    char *exe_dir = exe_dir_path(argv[0]);
+    dir_info exe_dir_info = get_dir_files_rec(exe_dir);
 
-    for (int i = 1; i < cwd_dir_info.length; i++)
+    for (int i = 1; i < exe_dir_info.length; i++)
     {   
-        char *file_path = cwd_dir_info.files[i]; 
+        char *file_path = exe_dir_info.files[i]; 
         FILE *f = fopen(file_path, "rb");
 
         if (file_exists_file(f))
@@ -83,13 +83,10 @@ int main(int argc, char **argv)
                         }
                         else
                         {
-                            fprintf(stderr, "Can't find file: %s, cwd: %s\n", arg, cwd);
+                            fprintf(stderr, "Can't find file: %s, exe_dir: %s\n", arg, exe_dir);
                         }
-
                     }
-
                 }
-
 
                 FILE *new_file = fopen(new_file_path, "wb");
                 fprintf(new_file, file_content);
@@ -104,9 +101,5 @@ int main(int argc, char **argv)
         }
 
     }
-
-
-
-
 
 }

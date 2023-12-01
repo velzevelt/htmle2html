@@ -5,7 +5,9 @@
         "dirent.h": "c",
         "asprintf.h": "c",
         "cstdlib": "c",
-        "*.htmle": "html"
+        "*.htmle": "html",
+        "bitset": "c",
+        "string_view": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 
