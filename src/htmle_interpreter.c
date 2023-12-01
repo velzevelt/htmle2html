@@ -22,9 +22,10 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
     char *output = malloc(input_size * sizeof(char));
     strncpy(output, input, input_size);
 
+
     for (; char_position < input_size; char_position++)
     {
-        char *p_symbol = &output[char_position];
+        char *p_symbol = &input[char_position];
         relative_char_position++;
 
         if (*p_symbol == '\n')
@@ -72,13 +73,15 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
                             if (file_exists_file(f))
                             {
                                 char *file_content = get_file_contents(f);
+                                
                                 size_t file_size = strlen(file_content);
                                 real_size += file_size;
 
-                                printf("CONTENT %s\n", file_content);
+                                output = realloc(output, real_size * sizeof(char));
+                                strncpy(&output[char_position], file_content, file_size);
 
-                                // char *output_2 = realloc(output, real_size * sizeof(char));
-                                // output = output_2;
+                                // printf("CONTENT %s\n", file_content);
+
                                 fclose(f);
                             }
                             else
@@ -96,7 +99,7 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
             }
             else
             {
-                print_error_message("Missing \'?>\'", line_position, p_symbol, relative_char_position, file_path);
+                print_error_message("Missing \'?>\'", p_symbol, line_position, relative_char_position, file_path);
             }
         }
     }
