@@ -1,10 +1,15 @@
 #include <string.h>
 
-typedef struct
+void print_error_message(const char err_message[], char *p_symbol, size_t line_position, size_t relative_char_position, const char file_path[])
 {
-    size_t resize_char_position;
-    char *resize_content;
-} resize_info;
+    char *error_message;
+    asprintf(&error_message, "ERROR: %s \'?>\' at line %i:%i in file %s\n", err_message, line_position + 1, relative_char_position + 1, file_path);
+    fprintf(stderr, error_message);
+    strncpy(p_symbol, error_message, strlen(error_message));
+    free(err_message);
+}
+
+
 
 const char *interp_htmle(const char input[], const char file_path[], const dir_info *env)
 {
@@ -53,7 +58,17 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
                             arg_path[arg_size] = '\0';
                             printf("We have argument! %s\n", arg_path);
 
-                            FILE *f = fopen(arg_path, "rb");
+                            char *full_arg_path;
+                            for (int i = 0; i < env->length; i++)
+                            {
+                                if (strstr(env->files[i], arg_path))
+                                {
+                                    full_arg_path = env->files[i];
+                                }
+                            }
+
+
+                            FILE *f = fopen(full_arg_path, "rb");
                             if (file_exists_file(f))
                             {
                                 char *file_content = get_file_contents(f);
@@ -66,27 +81,22 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
                                 // output = output_2;
                                 fclose(f);
                             }
+                            else
+                            {
+                                print_error_message("Can't find include file", p_symbol, line_position, relative_char_position, file_path);
+                            }
                             
                         }
                     }
                     else
                     {
-                        char *error_message;
-                        asprintf(&error_message, "ERROR: \'include\' command expects string argument \'path\' e.g. include(\"file_1.txt\") at line %i:%i in file %s\n", line_position + 1, relative_char_position + 1, file_path);
-                        fprintf(stderr, error_message);
-                        strncpy(p_symbol, error_message, strlen(error_message));
+                        print_error_message("\'include\' command expects string argument \'path\' e.g. include(\"file_1.txt\")", p_symbol, line_position, relative_char_position, file_path);
                     }
                 }
-
-                // printf("SIZE %i\n", size);
-                // printf("S %c\n", inter_commands_end[0]);
             }
             else
             {
-                char *error_message;
-                asprintf(&error_message, "ERROR: Missing \'?>\' at line %i:%i in file %s\n", line_position + 1, relative_char_position + 1, file_path);
-                fprintf(stderr, error_message);
-                strncpy(p_symbol, error_message, strlen(error_message));
+                print_error_message("Missing \'?>\'", line_position, p_symbol, relative_char_position, file_path);
             }
         }
     }
