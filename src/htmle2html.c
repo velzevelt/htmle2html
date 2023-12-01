@@ -42,7 +42,7 @@ int main(int argc, char **argv)
                 const char *file_content = get_file_contents(f);
                 // printf("file content:\n%s\n", file_content);
 
-                const char *interp_out = interp_htmle(file_content, get_file_name(file_path));
+                const char *interp_out = interp_htmle(file_content, get_file_name(file_path), exe_dir_info);
                 printf("Interp result: %s\n", interp_out);
 
                 // FILE *new_file = fopen(new_file_path, "wb");

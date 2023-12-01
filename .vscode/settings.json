@@ -1,7 +1,8 @@
 {
     "files.associations": {
         "sstream": "c",
-        "cstring": "c"
+        "cstring": "c",
+        "source_location": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 
