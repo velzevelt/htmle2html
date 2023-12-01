@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <cli.c>
 #include <filesystem.c>
+#include <htmle_interpreter.c>
 
 
 #if defined(WIN32)
@@ -20,7 +21,7 @@ int main(int argc, char **argv)
 
     for (int i = 1; i < exe_dir_info.length; i++)
     {   
-        char *file_path = exe_dir_info.files[i]; 
+        const char *file_path = exe_dir_info.files[i]; 
         FILE *f = fopen(file_path, "rb");
 
         if (file_exists_file(f))
@@ -36,61 +37,16 @@ int main(int argc, char **argv)
                 char *file_content = get_file_contents(f);
                 // printf("file content:\n%s\n", file_content);
 
-                char *contain;
-                if (contain = strstr(file_content, "<?e"))
+                char *contain_htmle;
+                if (contain_htmle = strstr(file_content, "<?e"))
                 {   
-                    int substring_size = get_line_length(contain);
-                    char substring[substring_size];
-
-                    strncpy(substring, contain, substring_size);
-                    substring[substring_size] = '\0';
-
-                    char *command;
-                    if (command = strstr(substring, "include"))
-                    {
-                        char *arg_begin;
-                        char *arg_end;
-
-                        arg_begin = strstr(command, "(\"");
-                        arg_end = strstr(command, "\")");
-
-                        arg_begin += 2;
-                        arg_end--;
-
-                        int size_between = arg_end - arg_begin + 1;
-
-                        printf("size between arg_start and arg_end is %i\n", size_between);
-
-                        char arg[size_between + 1];
-                        strncpy(arg, arg_begin, size_between);
-                        arg[size_between + 1] = '\0';
-
-                        printf("parsed arg is %s\n", arg);
-                        FILE *include_file = fopen(arg, "rb");
-
-                        if (file_exists_file(include_file))
-                        {
-                            char *include_content = get_file_contents(include_file);
-                            // printf("Include content is %s\n", include_content);
-
-                            char *new_file_content = calloc(strlen(file_content) + strlen(include_content) + 10, sizeof(char));
-                            strncpy(new_file_content, file_content, strlen(file_content));
-                            strncpy(&new_file_content[strlen(file_content)], include_content, strlen(include_content));
-
-                            printf("New file content is %s\n", new_file_content);
-
-                            fclose(include_file);
-                        }
-                        else
-                        {
-                            fprintf(stderr, "Can't find file: %s, exe_dir: %s\n", arg, exe_dir);
-                        }
-                    }
+                    char *interp_out = interp_htmle(file_content);
+                    printf("Interp result: %s\n", interp_out);
                 }
 
-                FILE *new_file = fopen(new_file_path, "wb");
-                fprintf(new_file, file_content);
-                fclose(new_file);
+                // FILE *new_file = fopen(new_file_path, "wb");
+                // fprintf(new_file, file_content);
+                // fclose(new_file);
             }
 
             fclose(f);

@@ -46,7 +46,7 @@ char *change_file_extension(const char file_path[], const char new_extension[])
 {
     int path_size = strlen(file_path);
 
-    char *old_extension = get_file_extension(file_path);
+    const char *old_extension = get_file_extension(file_path);
     int old_extension_size = strlen(old_extension);
     int new_extension_size = strlen(new_extension);
 
@@ -130,7 +130,7 @@ typedef struct
 
 } dir_info;
 
-dir_info get_dir_files_of_type(char *path, int (*condition)(struct dirent *))
+dir_info get_dir_files_of_type(const char *path, int (*condition)(struct dirent *))
 {
     DIR *d = opendir(path);
     if (d == NULL)
@@ -177,7 +177,7 @@ dir_info get_dir_files_of_type(char *path, int (*condition)(struct dirent *))
     return res;
 }
 
-dir_info get_dir_files(char *path)
+dir_info get_dir_files(const char *path)
 {
     int con(struct dirent * dir)
     {
@@ -187,7 +187,7 @@ dir_info get_dir_files(char *path)
     return get_dir_files_of_type(path, con);
 }
 
-dir_info get_dir_dir(char *path)
+dir_info get_dir_dir(const char *path)
 {
     int con(struct dirent * dir)
     {
@@ -281,7 +281,7 @@ int count_dir_files(const char path[])
 char *exe_dir_path(char *arg_0)
 {
     char *exe_path = realpath(arg_0, NULL);
-    char *exe_dir_path = above(exe_path, 1);
+    const char *exe_dir_path = above(exe_path, 1);
     return exe_dir_path;
 }
 
