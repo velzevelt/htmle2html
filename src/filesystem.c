@@ -37,8 +37,8 @@ const char *get_file_extension(const char file_path[])
     }
     else
     {
-        fprintf(stderr, "Fail to get file extension at path %s\n", file_path);
-        return NULL;
+        fprintf(stderr, "Failed to get file extension at path %s\n", file_path);
+        return "";
     }
 }
 
@@ -199,8 +199,13 @@ dir_info get_dir_dir(const char *path)
 void free_files(char **files, int size)
 {
     for (int i = 0; i < size; i++)
-        free(files[i]);
-    free(files);
+    {
+        printf("FREED: %s\n", files[i]);
+        free((char*)files[i]);
+    }
+
+    printf("A %p\n", files);
+    // free((char**)files);
 }
 
 void free_dir_info(dir_info *d)
@@ -223,11 +228,13 @@ void append_files(dir_info *self, const dir_info *other)
     for (int i = self->length, j = 0; i < new_size; i++, j++)
     {
         int t = strlen(other->files[j]);
-        new_files[i] = malloc(sizeof(other->files[j]) * t);
+        new_files[i] = malloc(sizeof(other->files[0]) * t);
         strncpy(new_files[i], other->files[j], t + 1);
     }
 
     free_dir_info(self);
+    // free_files(self->files, self->length);
+    
     self->files = new_files;
     self->length = new_size;
 }
