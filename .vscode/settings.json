@@ -1,13 +1,7 @@
 {
     "files.associations": {
-        "charconv": "c",
-        "stdio.h": "c",
-        "dirent.h": "c",
-        "asprintf.h": "c",
-        "cstdlib": "c",
-        "*.htmle": "html",
-        "bitset": "c",
-        "string_view": "c"
+        "sstream": "c",
+        "cstring": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 

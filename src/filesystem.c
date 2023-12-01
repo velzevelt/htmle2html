@@ -80,6 +80,36 @@ int file_has_extension(const char file_path[], const char extension[])
     return res;
 }
 
+const char *get_file_name(const char path[])
+{
+    int path_size = strlen(path);
+
+    // if last char is dir separator we can't go above, so need to return same path
+    if (path_size == 0 || path_size == 1)
+    {
+        return (char *)path;
+    }
+
+    int dir_separator_id = -1;
+    for (int i = path_size - 1; i >= 1; i--)
+    {
+        if (path[i] == DIR_SEPARATOR)
+        {
+            dir_separator_id = i;
+            break;
+        }
+    }
+
+    if (dir_separator_id == -1)
+    {
+        printf("WARNING: no dir separator \"%c\" with steps found in provided path %s\n",
+               DIR_SEPARATOR, path);
+        return (char *)path;
+    }
+
+    return &path[dir_separator_id + 1];
+}
+
 const char *above(const char path[], int above_steps)
 {
     int path_size = strlen(path);
