@@ -53,6 +53,21 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
     for (int i = 0; i < lines_size; i++)
     {
         printf("AA: %s\n", out[i]);
+
+        char *htmle_begin;
+        char *htmle_end;
+        if (htmle_begin = strstr(out[i], "<?e"))
+        {
+            if (htmle_end = strstr(out[i], "?>"))
+            {
+
+            }
+            else
+            {
+                int char_pos = strlen(out[i]) - strlen(htmle_begin) + 1;
+                fprintf(stderr, "ERROR: Missing \'?>\' at %s %i:%i\n", get_file_name(file_path), i + 1, char_pos);
+            }
+        }
     }
 
     return "123";
