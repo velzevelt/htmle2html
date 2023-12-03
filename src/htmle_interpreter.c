@@ -46,7 +46,7 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
                 out[lines_size] = (char *)calloc(distance, sizeof(char));
                 strncpy(out[lines_size], line_begin, distance);
                 out[lines_size][distance] = '\n';
-                printf("Copy result %s\n", out[lines_size]);
+                // printf("Copy result %s\n", out[lines_size]);
             }
 
             line_begin = line_end + 1;
