@@ -2,11 +2,16 @@
 
 const char *interp_htmle(const char input[], const char file_path[], const dir_info *env)
 {
+    if (input == NULL)
+    {
+        return NULL;
+    }
+
     size_t input_size = strlen(input);
 
     if (input_size == 0)
     {
-        return "";
+        return NULL;
     }
 
     char **out = calloc(input_size, sizeof(char **));
@@ -24,6 +29,10 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
             // printf("Line end: \t%p\n", line_end);
 
             int distance = line_end - line_begin;
+            
+            if (lines_size == 0)
+                distance -= 2;
+            
             // printf("DIST %i\n", distance);
 
             int min_dis = distance <= 0 ? 1 : distance;
@@ -37,8 +46,9 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
                 out[lines_size] = (char *)calloc(distance, sizeof(char));
                 strncpy(out[lines_size], line_begin, distance);
                 out[lines_size][distance] = '\n';
-                // printf("TT %s\n", out[lines_size]);
+                printf("Copy result %s\n", out[lines_size]);
             }
+
             line_begin = line_end + 1;
             lines_size++;
         }

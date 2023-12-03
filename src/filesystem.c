@@ -331,8 +331,11 @@ char *get_file_contents(FILE *f)
     fseek(f, 0, SEEK_END);
     long length = ftell(f);
     fseek(f, 0, SEEK_SET);
-    char *buffer = malloc(length);
 
+    if (length <= 0)
+        return "";
+
+    char *buffer = malloc(length);
     if (buffer)
     {
         fread(buffer, 1, length, f);

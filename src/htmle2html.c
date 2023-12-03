@@ -37,10 +37,14 @@ void compile_rec(int argc, char **argv)
                 const char *interp_out = interp_htmle(file_content, file_path, &exe_dir_info);
                 printf("Interp result: %s\n", interp_out);
 
-                FILE *new_file = fopen(new_file_path, "wb");
-                fprintf(new_file, interp_out);
-                fclose(new_file);
-                free(interp_out);
+                if (interp_out != NULL)
+                {
+                    FILE *new_file = fopen(new_file_path, "wb");
+                    fprintf(new_file, interp_out);
+                    fclose(new_file);
+                    free(interp_out);
+                }
+                
             }
             else
             {
