@@ -1,5 +1,8 @@
 #define DIR_SEPARATOR '/'
 
+
+
+
 int file_exists_at_path(const char *file_name)
 {
     FILE *file;
@@ -230,7 +233,7 @@ void free_files(char **files, int size)
 {
     for (int i = 0; i < size; i++)
     {
-        printf("FREED: %s\n", files[i]);
+        // printf("FREED: %s\n", files[i]);
         free((char*)files[i]);
     }
 
@@ -263,6 +266,7 @@ void append_files(dir_info *self, const dir_info *other)
     }
 
     free_dir_info(self);
+    // free_2deep_pointer(self->files, self->length);
     // free_files(self->files, self->length);
     
     self->files = new_files;

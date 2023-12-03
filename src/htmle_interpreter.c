@@ -48,7 +48,7 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
     // printf("SIZE %i\n", lines_size);
     for (int i = 0; i < lines_size; i++)
     {
-        printf("Current line is: %s\n", out[i]);
+        // printf("Current line is: %s\n", out[i]);
 
         char *htmle_begin = strstr(out[i], "<?e");
         char *htmle_end = strstr(out[i], "?>");
@@ -106,7 +106,7 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
                     strncpy(arg, arg_begin, arg_size);
                     arg[arg_size] = '\0';
 
-                    printf("Arg is %s\n", arg);
+                    // printf("Arg is %s\n", arg);
 
                     for (int j = 0; j < env->length; j++)
                     {
@@ -114,7 +114,7 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
                         // printf("FILE IS %s\n", file);
                         if (strstr(file, arg))
                         {
-                            printf("File is %s\n", file);
+                            // printf("File is %s\n", file);
                             FILE *f = fopen(file, "rb");
                             if (file_exists_file(f))
                             {
@@ -138,19 +138,21 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
     for (int i = 0; i < lines_size; i++)
         res_size += strlen(out[i]);
 
-    printf("RES SIZE %i\n", res_size);
+    // printf("RES SIZE %i\n", res_size);
     char *res = calloc(res_size, sizeof(char));
     for (int i = 0; i < lines_size; i++)
     {
-        // char test[strlen(out[i])];
-        // strcat(test, out[i]);
-        // strcat(res, out[i]);
-        // printf("TEST %s\n", out[i]);
         strncat(res, out[i], strlen(out[i]));
-        printf("CUR RES IS %s\n", res);
+        // printf("CUR RES IS %s\n", res);
     }
 
-    printf("RES IS %s\n", res);
 
+    for (int i = 0; i < lines_size; i++)
+    {
+        free(out[i]);
+    }
+    free(out);
+
+    // printf("RES IS %s\n", res);
     return res;
 }
