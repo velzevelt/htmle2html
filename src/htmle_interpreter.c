@@ -119,9 +119,12 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
                             if (file_exists_file(f))
                             {
                                 char *content = get_file_contents(f);
+                                int content_size = strlen(content);
+                                
                                 free(out[i]);
                                 out[i] = content;
-                                // out[i][content_size] = '\0';
+                                out[i][content_size] = '\n';
+                                
                                 // printf("Out is %s\n", out[i]);
                                 fclose(f);
                             }
