@@ -9,7 +9,7 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
         return "";
     }
 
-    char **out = calloc(input_size, sizeof(char *));
+    char **out = calloc(input_size, sizeof(char **));
 
     char *line_begin = &input[0];
     size_t lines_size = 0;
@@ -120,12 +120,12 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
                             {
                                 char *content = get_file_contents(f);
                                 int content_size = strlen(content);
-                                
+
                                 free(out[i]);
                                 out[i] = content;
                                 out[i][content_size] = '\n';
                                 
-                                // printf("Out is %s\n", out[i]);
+                                printf("Out is %s\n", out[i]);
                                 fclose(f);
                             }
                             break;

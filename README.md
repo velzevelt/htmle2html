@@ -1,9 +1,22 @@
 # htmle2html
 
-### Refs for cli in c
-https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html
-https://stackoverflow.com/questions/498320/pass-arguments-into-c-program-from-command-line
-https://stackoverflow.com/questions/20076001/how-do-i-create-a-help-option-in-a-command-line-program-in-c-c
-https://www.gnu.org/software/libc/manual/html_node/Argp.html
+Simple program to allow includes in html files. Work only with *.htmle extension file
 
-Or make your own
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <?e include("header.html") ?>
+    <?e include("main.html") ?>
+    <?e include("footer.html") ?>
+
+</body>
+</html>
+
