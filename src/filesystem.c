@@ -234,7 +234,7 @@ void free_files(char **files, int size)
         free((char*)files[i]);
     }
 
-    printf("A %p\n", files);
+    // printf("A %p\n", files);
     // free((char**)files);
 }
 

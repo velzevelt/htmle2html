@@ -36,7 +36,7 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
             {
                 out[lines_size] = (char *)calloc(distance, sizeof(char));
                 strncpy(out[lines_size], line_begin, distance);
-                out[lines_size][distance] = '\0';
+                out[lines_size][distance] = '\n';
                 // printf("TT %s\n", out[lines_size]);
             }
             line_begin = line_end + 1;
@@ -45,10 +45,10 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
     }
 
 
-    printf("SIZE %i\n", lines_size);
+    // printf("SIZE %i\n", lines_size);
     for (int i = 0; i < lines_size; i++)
     {
-        printf("AA: %s\n", out[i]);
+        printf("Current line is: %s\n", out[i]);
 
         char *htmle_begin = strstr(out[i], "<?e");
         char *htmle_end = strstr(out[i], "?>");
@@ -119,18 +119,10 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
                             if (file_exists_file(f))
                             {
                                 char *content = get_file_contents(f);
-                                size_t content_size = strlen(content);
-
-                                if (content_size > 0)
-                                {
-                                    free(out[i]);
-                                    out[i] = malloc(content_size * sizeof(char));
-                                    strncpy(out[i], content, content_size);
-                                    out[i][content_size] = '\0';
-
-                                    printf("Out is %s\n", out[i]);
-                                }
-
+                                free(out[i]);
+                                out[i] = content;
+                                // out[i][content_size] = '\0';
+                                // printf("Out is %s\n", out[i]);
                                 fclose(f);
                             }
                             break;
@@ -141,22 +133,24 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
         }
     }
 
-    size_t total_out_size = 0;
+
+    size_t res_size = 0;
+    for (int i = 0; i < lines_size; i++)
+        res_size += strlen(out[i]);
+
+    printf("RES SIZE %i\n", res_size);
+    char *res = calloc(res_size, sizeof(char));
     for (int i = 0; i < lines_size; i++)
     {
-        total_out_size += strlen(out[i]);
-    }
-    printf("TOTAL SIZE: %i\n", total_out_size);
-
-    char *res = malloc(sizeof(char) * total_out_size);
-
-    for (int i = 0; i < lines_size; i++)
-    {
+        // char test[strlen(out[i])];
+        // strcat(test, out[i]);
+        // strcat(res, out[i]);
+        // printf("TEST %s\n", out[i]);
         strncat(res, out[i], strlen(out[i]));
+        printf("CUR RES IS %s\n", res);
     }
-    res[total_out_size] = '\0';
 
-    printf("RES: \n%s\n", res);
+    printf("RES IS %s\n", res);
 
-    return "123";
+    return res;
 }
