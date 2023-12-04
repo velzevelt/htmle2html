@@ -23,7 +23,7 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
         // printf("Line begin: \t%p\n", line_begin);
         // printf("SYM %c\n", input[i]);
 
-        if (input[i] == '\n')
+        if (input[i] == '\n' || input[i] == '\0')
         {
             char *line_end = &input[i];
             // printf("Line end: \t%p\n", line_end);
@@ -43,7 +43,7 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
                 out[lines_size] = (char *)calloc(distance + 2, sizeof(char));
                 strncpy(out[lines_size], line_begin, distance);
                 out[lines_size][distance] = '\0';
-                // printf("Copy result %s\n", out[lines_size]);
+                printf("Copy result %s\n", out[lines_size]);
             }
 
             line_begin = line_end + 1;
@@ -60,7 +60,8 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
     char *res = calloc(res_size, sizeof(char));
     for (int i = 0; i < lines_size; i++)
     {
-        strncat(res, out[i], strlen(out[i]));
+        // strncat(res, out[i], strlen(out[i]));
+        // strcat(res, out[i]);
         // printf("CUR RES IS %s\n", res);
     }
 
