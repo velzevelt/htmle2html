@@ -36,13 +36,13 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
             if (distance == 0)
             {
                 out[lines_size] = calloc(1, sizeof(char));
-                out[lines_size][0] = '\n';
+                out[lines_size][0] = '\0';
             }
             else
             {
                 out[lines_size] = (char *)calloc(distance, sizeof(char));
                 strncpy(out[lines_size], line_begin, distance);
-                out[lines_size][distance] = '\n';
+                out[lines_size][distance] = '\0';
                 // printf("Copy result %s\n", out[lines_size]);
             }
 
@@ -130,9 +130,9 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
 
                                 free(out[i]);
                                 out[i] = content;
-                                out[i][content_size] = '\n';
+                                out[i][content_size] = '\0';
                                 
-                                printf("Out is %s\n", out[i]);
+                                // printf("Out is %s\n", out[i]);
                                 fclose(f);
                             }
                             break;

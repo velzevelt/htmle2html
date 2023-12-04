@@ -2,7 +2,8 @@
     "files.associations": {
         "sstream": "c",
         "cstring": "c",
-        "source_location": "c"
+        "source_location": "c",
+        "*htmle": "html",
     },
     "C_Cpp.errorSquiggles": "disabled"
 
