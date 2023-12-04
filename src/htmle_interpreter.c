@@ -40,7 +40,7 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
             }
             else
             {
-                out[lines_size] = (char *)calloc(distance, sizeof(char));
+                out[lines_size] = (char *)calloc(distance + 2, sizeof(char));
                 strncpy(out[lines_size], line_begin, distance);
                 out[lines_size][distance] = '\0';
                 // printf("Copy result %s\n", out[lines_size]);
@@ -48,98 +48,6 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
 
             line_begin = line_end + 1;
             lines_size++;
-        }
-    }
-
-
-    // printf("SIZE %i\n", lines_size);
-    for (int i = 0; i < lines_size; i++)
-    {
-        // printf("Current line is: %s\n", out[i]);
-
-        char *htmle_begin = strstr(out[i], "<?e");
-        char *htmle_end = strstr(out[i], "?>");
-
-        if (htmle_begin && !htmle_end)
-        {
-            int char_pos = strlen(out[i]) - strlen(htmle_begin) + 1;
-            fprintf(stderr, "ERROR: Missing \'?>\' at %s %i:%i\n", get_file_name(file_path), i + 1, char_pos);
-            continue;
-        }
-
-        if (!htmle_begin && htmle_end)
-        {
-            int char_pos = strlen(out[i]) - strlen(htmle_end) + 1;
-            fprintf(stderr, "ERROR: Missing \'<?e\' at %s %i:%i\n", get_file_name(file_path), i + 1, char_pos);
-            continue;
-        }
-
-        if (!htmle_begin && !htmle_end)
-        {
-            continue; // regular line nothing to interp
-        }
-
-        if (htmle_begin && htmle_end)
-        {
-            char *include = strstr(htmle_begin, "include");
-
-            if (include)
-            {
-                char *arg_begin = strstr(include, "(\"");
-                char *arg_end = strstr(include, "\")");
-
-                if (!arg_begin || !arg_end)
-                {
-                    int char_pos = strlen(out[i]) - strlen(htmle_begin) + 1;
-                    fprintf(stderr, "ERROR: include(\"path\") expects one string arg at %s %i:%i\n", get_file_name(file_path), i + 1, char_pos);
-                    continue;
-                }
-
-                if (arg_begin && arg_end)
-                {
-
-                    arg_begin += 2;
-                    arg_end--;
-                    int arg_size = arg_end - arg_begin + 1;
-
-                    if (arg_size <= 0)
-                    {
-                        int char_pos = strlen(out[i]) - strlen(htmle_begin) + 1;
-                        fprintf(stderr, "ERROR: include(\"path\") expects one string arg at %s %i:%i\n", get_file_name(file_path), i + 1, char_pos);
-                        continue;
-                    }
-
-                    char arg[arg_size];
-                    strncpy(arg, arg_begin, arg_size);
-                    arg[arg_size] = '\0';
-
-                    // printf("Arg is %s\n", arg);
-
-                    for (int j = 0; j < env->length; j++)
-                    {
-                        char *file = env->files[j];
-                        // printf("FILE IS %s\n", file);
-                        if (strstr(file, arg))
-                        {
-                            // printf("File is %s\n", file);
-                            FILE *f = fopen(file, "rb");
-                            if (file_exists_file(f))
-                            {
-                                char *content = get_file_contents(f);
-                                int content_size = strlen(content);
-
-                                free(out[i]);
-                                out[i] = content;
-                                out[i][content_size] = '\0';
-                                
-                                // printf("Out is %s\n", out[i]);
-                                fclose(f);
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
         }
     }
 
