@@ -40,7 +40,8 @@ void compile_rec(int argc, char **argv)
                 if (interp_out != NULL)
                 {
                     FILE *new_file = fopen(new_file_path, "wb");
-                    fprintf(new_file, interp_out);
+                    // fprintf(new_file, interp_out);
+                    fputs(interp_out, new_file);
                     fclose(new_file);
                     free(interp_out);
                 }
