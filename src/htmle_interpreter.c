@@ -55,6 +55,7 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
     // Interp
     for (int i = 0; i < lines_size; i++)
     {
+        char *line = out[i];
         
     }
 

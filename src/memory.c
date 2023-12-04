@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <ctype.h>
 
 void free_2deep_pointer(void **array, size_t len)
 {
@@ -22,4 +23,19 @@ int has_null_terminator(const char *str, size_t max_line_length)
     }
 
     assert(1); // Unreachable
+}
+
+const char *get_line_begin(const char *str)
+{
+    int size = strlen(str);
+    for (int i = 0; i < size; i++)
+    {
+        if (str[i] != ' ')
+        {
+            return &str[i];
+        }
+
+        if (!isspace(str[i]))
+            return &str[i];
+    }
 }
