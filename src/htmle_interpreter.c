@@ -78,11 +78,11 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
                 int distance = end_e_position - begin_e_position;
                 // printf("distance %i\n", distance);
                 
-                char test[distance + 1];
-                strncpy(test, begin_e_position, distance);
-                test[distance + 1] = '\0';
+                char command[distance + 1];
+                strncpy(command, begin_e_position, distance);
+                command[distance + 1] = '\0';
 
-                printf("COMMAND IS: %s\n", test);
+                printf("COMMAND IS: %s\n", command);
 
                 begin_e_position = NULL;
                 end_e_position = NULL;
