@@ -23,15 +23,12 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
         // printf("Line begin: \t%p\n", line_begin);
         // printf("SYM %c\n", input[i]);
 
-        if (input[i] == '\n' || i == input_size)
+        if (input[i] == '\n')
         {
             char *line_end = &input[i];
             // printf("Line end: \t%p\n", line_end);
 
             int distance = line_end - line_begin;
-            
-            // if (lines_size == 0)
-                // distance -= 2;
             
             // printf("DIST %i\n", distance);
 
@@ -39,13 +36,13 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
             if (distance == 0)
             {
                 out[lines_size] = calloc(1, sizeof(char));
-                out[lines_size][0] = '\0';
+                out[lines_size][0] = '\n';
             }
             else
             {
                 out[lines_size] = (char *)calloc(distance, sizeof(char));
                 strncpy(out[lines_size], line_begin, distance);
-                out[lines_size][distance] = '\0';
+                out[lines_size][distance] = '\n';
                 // printf("Copy result %s\n", out[lines_size]);
             }
 
@@ -133,8 +130,7 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
 
                                 free(out[i]);
                                 out[i] = content;
-                                out[i][content_size - 1] = '\n';
-                                out[i][content_size] = '\0';
+                                out[i][content_size] = '\n';
                                 
                                 printf("Out is %s\n", out[i]);
                                 fclose(f);
