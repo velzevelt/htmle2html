@@ -84,6 +84,11 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
 
                 printf("COMMAND IS: %s\n", command);
 
+                if (strncmp(command, "i", 1) == 0)
+                {
+                    printf("Command is include\n");
+                }
+
                 begin_e_position = NULL;
                 end_e_position = NULL;
             }
