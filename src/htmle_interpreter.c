@@ -52,21 +52,25 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
     }
 
 
+    // Interp
+    for (int i = 0; i < lines_size; i++)
+    {
+        
+    }
+
     size_t res_size = 0;
     for (int i = 0; i < lines_size; i++)
         res_size += strlen(out[i]);
 
     // printf("RES SIZE %i\n", res_size);
-    char *res = calloc(res_size, sizeof(char));
+    char *res = calloc(res_size + 1, sizeof(char));
     for (int i = 0; i < lines_size; i++)
     {
+        printf("APPEND %s\n", out[i]);
         strncat(res, out[i], strlen(out[i]));
-        strcat(res, out[i]);
     }
-    // res[res_size] = '\0';
+    res[res_size + 1] = '\0';
 
-    
-    
 
     for (int i = 0; i < lines_size; i++)
     {

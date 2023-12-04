@@ -1,3 +1,5 @@
+#include <assert.h>
+
 void free_2deep_pointer(void **array, size_t len)
 {
     for (int i = 0; i < len; i++)
@@ -8,27 +10,16 @@ void free_2deep_pointer(void **array, size_t len)
 }
 
 
-// printf("CHECK NULL terminator\n");
-    // #define MAX_LINE_LEN 1024
-    // for (int i = 0; i < lines_size; i++)
-    // {
-    //     char *line = out[i];
+int has_null_terminator(const char *str, size_t max_line_length)
+{
+    for (int i = 0; i <= max_line_length; i++)
+    {
+        if (i == max_line_length)
+            return 0;
 
-    //     for (int j = 0; j <= MAX_LINE_LEN; j++)
-    //     {  
-    //         if (j == MAX_LINE_LEN)
-    //         {
-    //             // perror("line is not null terminated");
-    //             printf("line is not null terminated\n");
-    //             exit(1);
-    //         }
+        if (str[i] == '\0')
+            return 1;
+    }
 
-    //         char ch = line[j];
-    //         if (ch == '\0')
-    //         {
-    //             printf("null term position %i\n", j);
-    //             break;
-    //         }
-    //         // printf("LINE %i\n", j);
-    //     }
-    // }
+    assert(1); // Unreachable
+}
