@@ -29,7 +29,7 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
             // printf("Line end: \t%p\n", line_end);
 
             int distance = line_end - line_begin;
-            
+
             // printf("DIST %i\n", distance);
 
             int min_dis = distance <= 0 ? 1 : distance;
@@ -43,7 +43,7 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
                 out[lines_size] = (char *)calloc(distance + 2, sizeof(char));
                 strncpy(out[lines_size], line_begin, distance);
                 out[lines_size][distance] = '\0';
-                printf("Copy result %s\n", out[lines_size]);
+                // printf("Copy result %s\n", out[lines_size]);
             }
 
             line_begin = line_end + 1;
@@ -51,12 +51,43 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
         }
     }
 
-
     // Interp
     for (int i = 0; i < lines_size; i++)
     {
         char *line = out[i];
-        
+        int line_size = strlen(line);
+
+        char *begin_e_position = NULL;
+        char *end_e_position = NULL;
+        for (int j = 0; j < lines_size; j++)
+        {
+            if (strncmp(&line[j], "<?e", 3) == 0)
+            {
+                begin_e_position = &line[j] + 3;
+            }
+            else if (strncmp(&line[j], "?>", 2) == 0)
+            {
+                end_e_position = &line[j];
+            }
+
+            if (begin_e_position != NULL && end_e_position != NULL)
+            {
+                // printf("BEGIN %s\n", begin_e_position);
+                // printf("END %s\n", end_e_position);
+
+                int distance = end_e_position - begin_e_position;
+                // printf("distance %i\n", distance);
+                
+                char test[distance + 1];
+                strncpy(test, begin_e_position, distance);
+                test[distance + 1] = '\0';
+
+                printf("COMMAND IS: %s\n", test);
+
+                begin_e_position = NULL;
+                end_e_position = NULL;
+            }
+        }
     }
 
     size_t res_size = 0;
@@ -67,11 +98,10 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
     char *res = calloc(res_size + 1, sizeof(char));
     for (int i = 0; i < lines_size; i++)
     {
-        printf("APPEND %s\n", out[i]);
+        // printf("APPEND %s\n", out[i]);
         strncat(res, out[i], strlen(out[i]));
     }
     res[res_size + 1] = '\0';
-
 
     for (int i = 0; i < lines_size; i++)
     {
