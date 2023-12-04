@@ -60,11 +60,13 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
     char *res = calloc(res_size, sizeof(char));
     for (int i = 0; i < lines_size; i++)
     {
-        // strncat(res, out[i], strlen(out[i]));
-        // strcat(res, out[i]);
-        // printf("CUR RES IS %s\n", res);
+        strncat(res, out[i], strlen(out[i]));
+        strcat(res, out[i]);
     }
+    // res[res_size] = '\0';
 
+    
+    
 
     for (int i = 0; i < lines_size; i++)
     {
