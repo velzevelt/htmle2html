@@ -1,17 +1,11 @@
 #include <string.h>
 
-const char *get_begin_of_string(const char *str, size_t current_char_position)
-{
-    for (size_t i = current_char_position; i > 0; i--)
-    {
-        if (str[i] == '\n')
-        {
-            return &str[i];
-        }
-    }
-
-    return NULL;
-}
+typedef enum {
+    html_regular,
+    html_comment,
+    htmle_interp_begin,
+    htmle_interp_end,
+} token_type;
 
 typedef struct {
     token_type type;
