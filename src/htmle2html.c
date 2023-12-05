@@ -35,7 +35,7 @@ void compile_rec(int argc, char **argv)
                 // printf("file content:\n%s\n", file_content);
 
                 const char *interp_out = interp_htmle(file_content, file_path, &exe_dir_info);
-                printf("Interp result: %s\n", interp_out);
+                // printf("Interp result: %s\n", interp_out);
                 // printf("Interp result: %s\n", "123");
 
                 if (interp_out != NULL)
@@ -44,7 +44,7 @@ void compile_rec(int argc, char **argv)
                     // fprintf(new_file, interp_out);
                     fputs(interp_out, new_file);
                     fclose(new_file);
-                    free(interp_out);
+                    // free(interp_out);
                 }
                 
             }

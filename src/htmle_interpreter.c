@@ -1,5 +1,25 @@
 #include <string.h>
 
+const char *get_begin_of_string(const char *str, size_t current_char_position)
+{
+    for (size_t i = current_char_position; i > 0; i--)
+    {
+        if (str[i] == '\n')
+        {
+            return &str[i];
+        }
+    }
+
+    return NULL;
+}
+
+typedef struct {
+    token_type type;
+    char *string;
+    size_t line_postion;
+    size_t char_position;
+} htmle_token;
+
 const char *interp_htmle(const char input[], const char file_path[], const dir_info *env)
 {
     if (input == NULL)
@@ -7,113 +27,41 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
         return NULL;
     }
 
-    size_t input_size = strlen(input);
+    size_t input_size = strlen(input) + 1;
 
     if (input_size == 0)
     {
         return NULL;
     }
 
-    char **out = calloc(input_size, sizeof(char **));
+    char *input_copy = calloc(input_size, sizeof(char));
+    strncpy(input_copy, input, input_size);
 
-    char *line_begin = &input[0];
-    size_t lines_size = 0;
-    for (int i = 0; i <= input_size; i++)
+    char *e_begin = NULL;
+    char *e_end = NULL;
+    char *html_comment = NULL;
+
+    for (size_t i = 0; i < input_size; i++)
     {
-        // printf("Line begin: \t%p\n", line_begin);
-        // printf("SYM %c\n", input[i]);
-
-        if (input[i] == '\n' || input[i] == '\0')
+        if (strncmp(&input_copy[i], "<!--", 4) == 0)
         {
-            char *line_end = &input[i];
-            // printf("Line end: \t%p\n", line_end);
+            html_comment = &input_copy[i];
+        }
+        else if (strncmp(&input_copy[i], "<?e", 3) == 0)
+        {
+            e_begin = &input_copy[i];
+        }
+        else if (strncmp(&input_copy[i], "?>", 2) == 0)
+        {
+            e_end = &input_copy[i];
+        }
 
-            int distance = line_end - line_begin;
-
-            // printf("DIST %i\n", distance);
-
-            int min_dis = distance <= 0 ? 1 : distance;
-            if (distance == 0)
-            {
-                out[lines_size] = calloc(1, sizeof(char));
-                out[lines_size][0] = '\0';
-            }
-            else
-            {
-                out[lines_size] = (char *)calloc(distance + 2, sizeof(char));
-                strncpy(out[lines_size], line_begin, distance);
-                out[lines_size][distance] = '\0';
-                // printf("Copy result %s\n", out[lines_size]);
-            }
-
-            line_begin = line_end + 1;
-            lines_size++;
+        if (e_begin != NULL && e_end != NULL)
+        {
+            e_begin = NULL;
+            e_end = NULL;
         }
     }
 
-    // Interp
-    for (int i = 0; i < lines_size; i++)
-    {
-        char *line = out[i];
-        int line_size = strlen(line);
-
-        char *begin_e_position = NULL;
-        char *end_e_position = NULL;
-        for (int j = 0; j < lines_size; j++)
-        {
-            if (strncmp(&line[j], "<?e", 3) == 0)
-            {
-                begin_e_position = &line[j] + 3;
-            }
-            else if (strncmp(&line[j], "?>", 2) == 0)
-            {
-                end_e_position = &line[j];
-            }
-
-            if (begin_e_position != NULL && end_e_position != NULL)
-            {
-                // printf("BEGIN %s\n", begin_e_position);
-                // printf("END %s\n", end_e_position);
-
-                int distance = end_e_position - begin_e_position;
-                // printf("distance %i\n", distance);
-                
-                char command[distance + 1];
-                strncpy(command, begin_e_position, distance);
-                command[distance + 1] = '\0';
-
-                printf("COMMAND IS: %s\n", command);
-
-                if (strncmp(command, "i", 1) == 0)
-                {
-                    printf("Command is include\n");
-                }
-
-                begin_e_position = NULL;
-                end_e_position = NULL;
-            }
-        }
-    }
-
-    size_t res_size = 0;
-    for (int i = 0; i < lines_size; i++)
-        res_size += strlen(out[i]);
-
-    // printf("RES SIZE %i\n", res_size);
-    char *res = calloc(res_size + 1, sizeof(char));
-    for (int i = 0; i < lines_size; i++)
-    {
-        // printf("APPEND %s\n", out[i]);
-        strncat(res, out[i], strlen(out[i]));
-    }
-    res[res_size + 1] = '\0';
-
-    for (int i = 0; i < lines_size; i++)
-    {
-        free(out[i]);
-    }
-    free(out);
-
-    // printf("RES IS %s\n", res);
-    return res;
+    return input;
 }
