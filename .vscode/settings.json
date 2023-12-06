@@ -4,6 +4,9 @@
         "cstring": "c",
         "source_location": "c",
         "*htmle": "html",
+        "dirent.h": "c",
+        "stdlib.h": "c",
+        "stdio.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 
