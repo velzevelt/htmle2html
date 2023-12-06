@@ -15,8 +15,14 @@ typedef struct {
     size_t char_position;
 } htmle_token;
 
+typedef struct {
+    htmle_token *tokens;
+    size_t token_len;
+    size_t char_len;
+    size_t line_len;
+} ast;
 
-const *htmle_token parse_source(const char source[])
+ast parse_source(const char source[])
 {
     size_t char_len = strlen(source) + 1;
     size_t line_len = 0;
@@ -28,6 +34,11 @@ const *htmle_token parse_source(const char source[])
             line_len++;
         }
     }
+}
+
+const char *compile_ast(const ast *a)
+{
+
 }
 
 const char *interp_htmle(const char input[], const char file_path[], const dir_info *env)
