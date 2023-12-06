@@ -1,5 +1,21 @@
 #include <string.h>
 
+const char *strstr_reverse(const char *haystack, const char *needle)
+{
+    size_t needle_size = strlen(needle);
+    size_t haystack_size = strlen(haystack);
+
+    for (size_t i = haystack_size; i > 0; i -= needle_size)
+    {
+        if (strncmp(&haystack[i], needle, needle_size) == 0)
+        {
+            return &haystack[i];
+        }
+    }
+
+    return NULL;
+}
+
 const char *interp_htmle(const char input[], const char file_path[], const dir_info *env)
 {
     if (input == NULL)
@@ -23,6 +39,13 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
             printf("Found thing\n");
         }
     }
+
+    printf("TEST STRSTR REVERSE\n");
+    char *t = "ABOBA BIBA A";
+    char *t2 = "BI";
+    char *t3 = strstr_reverse(t, t2);
+    printf("OUT %c\n", t3[0]);
+
 
     return res;
 }
