@@ -340,6 +340,7 @@ char *get_file_contents(FILE *f)
     {
         fread(buffer, 1, length, f);
     }
+    buffer[length] = '\0';
 
     return buffer;
 }
