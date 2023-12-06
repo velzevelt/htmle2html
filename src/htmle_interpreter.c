@@ -5,11 +5,15 @@ const char *strstr_reverse(const char *haystack, const char *needle)
     size_t needle_size = strlen(needle);
     size_t haystack_size = strlen(haystack);
 
-    for (size_t i = haystack_size; i > 0; i -= needle_size)
+    for (size_t i = haystack_size; i >= 0; i--)
     {
         if (strncmp(&haystack[i], needle, needle_size) == 0)
         {
             return &haystack[i];
+        }
+        else if (i == 0)
+        {
+            break;
         }
     }
 
@@ -41,11 +45,10 @@ const char *interp_htmle(const char input[], const char file_path[], const dir_i
     }
 
     printf("TEST STRSTR REVERSE\n");
-    char *t = "ABOBA BIBA A";
-    char *t2 = "BI";
+    char *t = "DD \n ABOBA BIBA A";
+    char *t2 = "BO";
     char *t3 = strstr_reverse(t, t2);
-    printf("OUT %c\n", t3[0]);
-
+    printf("OUT %s\n", t3);
 
     return res;
 }
