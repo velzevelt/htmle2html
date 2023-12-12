@@ -31,20 +31,24 @@ void compile_rec(int argc, char **argv)
             if (file_exists_file(f))
             {
                 FILE *f2 = fopen(new_file_path, "wb");
-
-                char string[2048];
-                while (fgets(string, sizeof(string), f))
+                if (file_exists_file(f2))
                 {
-                    int contain_comment = strstr(string, "<!--");
-                    int contain_e_begin = strstr(string, "<?e");
-                    int contain_e_end = strstr(string, "?>");
+                    char string[2048];
+                    while (fgets(string, sizeof(string), f))
+                    {
+                        int contain_comment = strstr(string, "<!--");
+                        int contain_e_begin = strstr(string, "<?e");
+                        int contain_e_end = strstr(string, "?>");
 
-                    
+                        fputs(string, f2);
+                    }
 
-                    fputs(string, f2);
+                    fclose(f2);
                 }
-
-                fclose(f2);
+                else
+                {
+                    fprintf(stderr, "Cant create file at path %s\n", new_file_path);
+                }
             }
             else
             {
@@ -59,8 +63,8 @@ void compile_rec(int argc, char **argv)
 }
 
 void print_help()
-{   
-    const char *help_message = 
+{
+    const char *help_message =
         "htmle2html [DIR]\n"
         "  --help  Show this message\n";
     printf("%s\n", help_message);
