@@ -2,11 +2,26 @@
 #include <iostream>
 #include <vector>
 
+#ifdef WIN32
+#include <windows.h>
+#include <processenv.h>
+#include <shellapi.h>
+#endif
+
+
 namespace fs = std::filesystem;
 
 void compile_rec(int argc, char **argv)
 {
-    fs::path binary_path = argv[0];
+    #ifdef WIN32
+    LPWSTR cmd = GetCommandLineW();
+    LPWSTR *argvw = CommandLineToArgvW(cmd, &argc);
+    std::wstring zero_arg(argvw[0]);
+    #else
+    std::string zero_arg = argv[0];
+    #endif
+
+    fs::path binary_path = zero_arg;
     fs::path binary_parent = binary_path.parent_path();
     fs::path absolute_binary_parent = fs::absolute(binary_parent);
 
@@ -17,13 +32,11 @@ void compile_rec(int argc, char **argv)
         files.push_back(dir_entry.path());
     }
 
-    // for (auto const& s : files)
-    // {
-    //     std::cout << s << '\n';
-    // }
-
+    for (auto const& s : files)
+    {
+        std::cout << s << '\n';
+    }
 }
-
 
 
 int main(int argc, char **argv)
