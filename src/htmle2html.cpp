@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #ifdef WIN32
 #include <windows.h>
@@ -26,13 +27,23 @@ void compile_rec(int argc, char **argv)
     fs::path absolute_binary_parent = fs::absolute(binary_parent);
 
     std::vector<fs::path> files;
-
     for (auto const& dir_entry : fs::recursive_directory_iterator(absolute_binary_parent))
     {
         files.push_back(dir_entry.path());
     }
 
-    for (auto const& s : files)
+    // for (auto const& s : files)
+    // {
+    //     std::cout << s << '\n';
+    // }
+
+    std::vector<fs::path> htmle_files;
+    std::copy_if(files.begin(), files.end(), std::back_inserter(htmle_files), [](fs::path i) {
+        return i.extension().compare(".htmle") == 0;
+    });
+
+
+    for (auto const& s : htmle_files)
     {
         std::cout << s << '\n';
     }
