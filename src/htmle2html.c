@@ -42,7 +42,6 @@ void compile_rec(int argc, char **argv)
             continue;
         }
 
-
         printf("Changing file extension\nOld path: %s\nNew path: %s\n", file_path, new_file_path);
 
         FILE *out_file = fopen(new_file_path, "wb");
@@ -54,10 +53,12 @@ void compile_rec(int argc, char **argv)
             continue;
         }
 
-        size_t line_position = 1;
+        size_t line_position = 0;
         char string[2048];
         while (fgets(string, sizeof(string), source_file))
         {
+            line_position++;
+            char *out = string;
             char *contain_comment = strstr(string, "<!--");
             char *contain_e_begin = strstr(string, "<?e");
             char *contain_e_end = strstr(string, "?>");
@@ -68,17 +69,73 @@ void compile_rec(int argc, char **argv)
             {
                 fprintf(stderr, "Syntax error at line %i, expected ?>\n", line_position);
                 strcpy(contain_e_begin, "Syntax error, expected ?>");
+
+                fputs(out, out_file);
+                continue;
             }
 
-            fputs(string, out_file);
-            line_position++;
+            int correct_include = !contain_comment && contain_e_begin && contain_e_end && contain_include;
+            if (correct_include)
+            {
+                char *arg_begin = strstr(contain_include, "(\"");
+                char *arg_end = strstr(contain_include, "\")");
+                int correct_argument = arg_begin && arg_end;
+
+                if (!correct_argument)
+                {
+                    fprintf(stderr, "Error at line %i, include expects one string argument e.g. include(\"file.txt\")\n", line_position);
+                    strcpy(contain_e_begin, "Error, include expects one string argument e.g. include(\"file.txt\")");
+                    fputs(out, out_file);
+                    continue;
+                }
+
+                arg_begin += 2;
+                arg_end -= 1;
+
+                int argument_size = arg_end - arg_begin + 1;
+                char argument[argument_size];
+                strncpy(argument, arg_begin, argument_size);
+                argument[argument_size] = '\0';
+
+                char *include_file_path;
+                for (size_t j = 0; j < exe_dir_info.length; ++j)
+                {
+                    if (strstr(exe_dir_info.files[j], argument))
+                    {
+                        include_file_path = exe_dir_info.files[j];
+                        break;
+                    }
+                }
+
+                if (include_file_path)
+                {
+                    FILE *include_file = fopen(include_file_path, "rb");
+                    if (include_file)
+                    {
+                        char *include_content = get_file_contents(include_file);
+                        fputs(include_content, out_file);
+                        free(include_content);
+                        fclose(include_file);
+                        continue;
+                    }
+                }
+                else
+                {
+                    fprintf(stderr, "Error at line %i, include file not found \n", line_position);
+                    strcpy(contain_e_begin, "Error, include file not found");
+                    fputs(out, out_file);
+                    continue;
+                }
+            }
+
+            // regular
+            fputs(out, out_file);
         }
 
         fclose(source_file);
         fclose(out_file);
         free(new_file_path);
     }
-
 
     free_2deep_pointer(exe_dir_info.files, exe_dir_info.length);
     free(exe_dir);
