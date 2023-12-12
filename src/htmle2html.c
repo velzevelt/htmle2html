@@ -59,7 +59,13 @@ void compile_rec(int argc, char **argv)
         {
             line_position++;
             char *out = string;
+            
             char *contain_comment = strstr(string, "<!--");
+            if (!contain_comment)
+            {
+                contain_comment = strstr(string, "-->");
+            }
+
             char *contain_e_begin = strstr(string, "<?e");
             char *contain_e_end = strstr(string, "?>");
             char *contain_include = strstr(string, "include");
