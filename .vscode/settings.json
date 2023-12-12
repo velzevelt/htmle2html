@@ -6,7 +6,8 @@
         "*htmle": "html",
         "dirent.h": "c",
         "stdlib.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "filesystem": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 
