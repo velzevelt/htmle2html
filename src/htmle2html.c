@@ -2,15 +2,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+
+#ifdef WIN32
+#include <dirent_windows.h>
+#define realpath(N,R) _fullpath((R),(N),PATH_MAX)
+#else
 #include <dirent.h>
-#include <unistd.h>
+#endif
+
 #include <memory.c>
 #include <cli.c>
 #include <filesystem.c>
 
-#if defined(WIN32)
-#include <asprintf.h>
-#endif
+
+
 
 void compile_rec(int argc, char **argv)
 {
