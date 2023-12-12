@@ -7,7 +7,6 @@
 #include <memory.c>
 #include <cli.c>
 #include <filesystem.c>
-#include <htmle_interpreter.c>
 
 #if defined(WIN32)
 #include <asprintf.h>
@@ -31,21 +30,21 @@ void compile_rec(int argc, char **argv)
             FILE *f = fopen(file_path, "rb");
             if (file_exists_file(f))
             {
-                const char *file_content = get_file_contents(f);
-                // printf("file content:\n%s\n", file_content);
+                FILE *f2 = fopen(new_file_path, "wb");
 
-                const char *interp_out = interp_htmle(file_content, file_path, &exe_dir_info);
-                printf("Interp result: %s\n", interp_out);
-
-                if (interp_out != NULL)
+                char string[2048];
+                while (fgets(string, sizeof(string), f))
                 {
-                    FILE *new_file = fopen(new_file_path, "wb");
-                    // fprintf(new_file, interp_out);
-                    fputs(interp_out, new_file);
-                    fclose(new_file);
-                    // free(interp_out);
+                    int contain_comment = strstr(string, "<!--");
+                    int contain_e_begin = strstr(string, "<?e");
+                    int contain_e_end = strstr(string, "?>");
+
+                    
+
+                    fputs(string, f2);
                 }
-                
+
+                fclose(f2);
             }
             else
             {
