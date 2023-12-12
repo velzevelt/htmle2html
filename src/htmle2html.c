@@ -22,42 +22,64 @@ void compile_rec(int argc, char **argv)
         const char *file_path = exe_dir_info.files[i];
         const char *file_extension = get_file_extension(file_path);
 
-        if (strncmp(file_extension, "htmle", 5) == 0)
+        int has_htmle = strncmp(file_extension, "htmle", 5) == 0;
+
+        if (!has_htmle)
+            continue;
+
+        FILE *source_file = fopen(file_path, "rb");
+        if (source_file == NULL)
         {
-            const char *new_file_path = change_file_extension(file_path, "html");
-            printf("Changing file extension\nOld path: %s\nNew path: %s\n", file_path, new_file_path);
-
-            FILE *f = fopen(file_path, "rb");
-            if (file_exists_file(f))
-            {
-                FILE *f2 = fopen(new_file_path, "wb");
-                if (file_exists_file(f2))
-                {
-                    char string[2048];
-                    while (fgets(string, sizeof(string), f))
-                    {
-                        int contain_comment = strstr(string, "<!--");
-                        int contain_e_begin = strstr(string, "<?e");
-                        int contain_e_end = strstr(string, "?>");
-
-                        fputs(string, f2);
-                    }
-
-                    fclose(f2);
-                }
-                else
-                {
-                    fprintf(stderr, "Cant create file at path %s\n", new_file_path);
-                }
-            }
-            else
-            {
-                fprintf(stderr, "File does not exist at path %s\n", file_path);
-            }
-            free(new_file_path);
+            fprintf(stderr, "File does not exist at path %s\n", file_path);
+            continue;
         }
+
+        char *new_file_path = change_file_extension(file_path, "html");
+        if (new_file_path == NULL)
+        {
+            fprintf(stderr, "Invalid new path\n");
+            fclose(source_file);
+            continue;
+        }
+
+
+        printf("Changing file extension\nOld path: %s\nNew path: %s\n", file_path, new_file_path);
+
+        FILE *out_file = fopen(new_file_path, "wb");
+        if (out_file == NULL)
+        {
+            fprintf(stderr, "Cant create file at path %s\n", new_file_path);
+            fclose(source_file);
+            free(new_file_path);
+            continue;
+        }
+
+        size_t line_position = 1;
+        char string[2048];
+        while (fgets(string, sizeof(string), source_file))
+        {
+            char *contain_comment = strstr(string, "<!--");
+            char *contain_e_begin = strstr(string, "<?e");
+            char *contain_e_end = strstr(string, "?>");
+            char *contain_include = strstr(string, "include");
+
+            int syntax_error = !contain_comment && contain_e_begin && !contain_e_end;
+            if (syntax_error)
+            {
+                fprintf(stderr, "Syntax error at line %i, expected ?>\n", line_position);
+                strcpy(contain_e_begin, "Syntax error, expected ?>");
+            }
+
+            fputs(string, out_file);
+            line_position++;
+        }
+
+        fclose(source_file);
+        fclose(out_file);
+        free(new_file_path);
     }
-    // free_dir_info(&exe_dir_info);
+
+
     free_2deep_pointer(exe_dir_info.files, exe_dir_info.length);
     free(exe_dir);
 }
