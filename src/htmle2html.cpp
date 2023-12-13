@@ -154,7 +154,7 @@ int main(int argc, char **argv)
                 bool found_closest = false;
                 for (auto const &p : files)
                 {
-                    bool is_closest = p.filename().compare(arg) == 0;
+                    bool is_closest = is_valid_position(p.string().find(arg));
                     if (is_closest)
                     {
                         closest = p;
