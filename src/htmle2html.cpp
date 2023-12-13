@@ -11,6 +11,8 @@
 #include <shellapi.h>
 #endif
 
+#define USAGE "Usage: htmle2html [htmle src directory] [Optional | html out directory]"
+
 namespace fs = std::filesystem;
 
 int main(int argc, char **argv)
@@ -18,55 +20,79 @@ int main(int argc, char **argv)
     if (argc < 2)
     {
         std::cerr << "No input directory provided" << '\n'
-                  << "Usage: htmle2html [directory]" << '\n';
+                  << USAGE << '\n';
         return EXIT_FAILURE;
     }
 
-#ifdef WIN32
+    #ifdef WIN32
     LPWSTR cmd = GetCommandLineW();
     LPWSTR *argvw = CommandLineToArgvW(cmd, &argc);
-    std::wstring zero_arg(argvw[1]);
-#else
-    std::string zero_arg = argv[1];
-#endif
+    std::wstring src_arg(argvw[1]);
+    std::wstring out_arg = src_arg;
+    if (argc > 2)
+    {
+        out_arg = argvw[2];
+    }
 
+    #else
+    std::string src_arg = argv[1];
+    std::string out_arg = src_arg;
+    if (argc > 2)
+    {
+        out_arg = argv[2];
+    }
+    #endif
 
-    if (not fs::exists(zero_arg))
+    if (not fs::exists(src_arg))
     {
         #ifdef WIN32
-        std::wcerr << "Invalid input provided, directory \"" << zero_arg << "\" not found" << '\n'
-                   << "Usage: htmle2html [directory]" << '\n';
+        std::wcerr << "Invalid input provided, directory \"" << src_arg << "\" not found" << '\n'
+                   << USAGE << '\n';
         #else
-        std::cerr << "Invalid input provided, directory \"" << zero_arg << "\" not found" << '\n'
-                  << "Usage: htmle2html [directory]" << '\n';
+        std::cerr << "Invalid input provided, directory \"" << src_arg << "\" not found" << '\n'
+                  << USAGE << '\n';
         #endif
-
         return EXIT_FAILURE;
     }
 
-
-    fs::path arg_path = zero_arg;
-    if (not fs::is_directory(arg_path))
+    if (not fs::exists(out_arg))
     {
-        std::cerr << "Invalid input provided, file \"" << arg_path.string() << "\" is not dir" << '\n'
-                  << "Usage: htmle2html [directory]" << '\n';
+        #ifdef WIN32
+        std::wcerr << "Invalid input provided, directory \"" << out_arg << "\" not found" << '\n'
+                   << USAGE << '\n';
+        #else
+        std::cerr << "Invalid input provided, directory \"" << out_arg << "\" not found" << '\n'
+                  << USAGE << '\n';
+        #endif
+        return EXIT_FAILURE;
+    }
+
+    fs::path src_path = src_arg;
+    if (not fs::is_directory(src_path))
+    {
+        std::cerr << "Invalid input provided, file \"" << src_path.string() << "\" is not dir" << '\n'
+                  << USAGE << '\n';
+
+        return EXIT_FAILURE;
+    }
+    
+    fs::path out_path = out_arg;
+    if (not fs::is_directory(out_path))
+    {
+        std::cerr << "Invalid input provided, file \"" << out_path.string() << "\" is not dir" << '\n'
+                  << USAGE << '\n';
 
         return EXIT_FAILURE;
     }
 
-    fs::path absolute_arg_parent = fs::absolute(arg_path);
-
+    fs::path absolute_src_path = fs::absolute(src_path);
+    fs::path absolute_out_path = fs::absolute(out_path);
 
     std::vector<fs::path> files;
-    for (auto const &dir_entry : fs::recursive_directory_iterator(absolute_arg_parent))
+    for (auto const &dir_entry : fs::recursive_directory_iterator(absolute_src_path))
     {
         files.push_back(dir_entry.path());
     }
-
-    // for (auto const& s : files)
-    // {
-    //     std::cout << s << '\n';
-    // }
 
     std::vector<fs::path> htmle_files;
     std::copy_if(files.begin(), files.end(), std::back_inserter(htmle_files), [](fs::path i)
@@ -74,8 +100,10 @@ int main(int argc, char **argv)
 
     for (auto const &s : htmle_files)
     {
-        fs::path new_file_path = s;
-        new_file_path.replace_extension(".html");
+        fs::path new_file_path = absolute_out_path;
+        new_file_path /= s.filename().replace_extension(".html");
+
+        // std::cout << "NEW PATH " << new_file_path << "\n";
 
         std::cout << "Compiling file " << s.filename()
                   << " to " << new_file_path.filename()
@@ -169,7 +197,6 @@ int main(int argc, char **argv)
                     out_file << "Error " << s.filename() << " " << line_position << ":" << e_begin_position << " include file " << arg << "not found" << '\n';
                     continue;
                 }
-                
 
                 std::ifstream include_file(closest);
                 if (not include_file.is_open())
