@@ -5,12 +5,10 @@ linux-release:
 	g++ -I ./src/ ./src/htmle2html.cpp -o ./bin/htmle2html -Wall -Wextra -O2
 
 linux-mingw:
-	i686-w64-mingw32-c++ -I ./src/ ./src/htmle2html.cpp -o ./bin/htmle2html -Wall -Wextra -g -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic -DWIN32
+	i686-w64-mingw32-c++ -I ./src/ ./src/htmle2html.cpp -o ./bin/htmle2html -Wall -Wextra -g -static -DWIN32
 
-
-
-# linux-mingw:
-# 	i686-w64-mingw32-g++ -I ./src/ ./src/htmle2html.cpp -o ./bin/htmle2html -Wall -Wextra -g -static
+linux-mingw-release:
+	i686-w64-mingw32-c++ -I ./src/ ./src/htmle2html.cpp -o ./bin/htmle2html -Wall -Wextra -static -DWIN32 -O2
 
 
 windows-cygwin:

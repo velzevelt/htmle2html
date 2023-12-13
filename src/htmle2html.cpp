@@ -30,16 +30,32 @@ int main(int argc, char **argv)
     std::string zero_arg = argv[1];
 #endif
 
+
     if (not fs::exists(zero_arg))
     {
+        #ifdef WIN32
+        std::wcerr << "Invalid input provided, directory \"" << zero_arg << "\" not found" << '\n'
+                   << "Usage: htmle2html [directory]" << '\n';
+        #else
         std::cerr << "Invalid input provided, directory \"" << zero_arg << "\" not found" << '\n'
                   << "Usage: htmle2html [directory]" << '\n';
+        #endif
+
         return EXIT_FAILURE;
     }
 
+
     fs::path arg_path = zero_arg;
-    fs::path arg_parent = arg_path.parent_path();
-    fs::path absolute_arg_parent = fs::absolute(arg_parent);
+    if (not fs::is_directory(arg_path))
+    {
+        std::cerr << "Invalid input provided, file \"" << arg_path.string() << "\" is not dir" << '\n'
+                  << "Usage: htmle2html [directory]" << '\n';
+
+        return EXIT_FAILURE;
+    }
+
+    fs::path absolute_arg_parent = fs::absolute(arg_path);
+
 
     std::vector<fs::path> files;
     for (auto const &dir_entry : fs::recursive_directory_iterator(absolute_arg_parent))
