@@ -26,4 +26,4 @@ Simple program to allow includes in html files. Work only with *.htmle extension
 search for include files happens only at first src directory
 
 ```bash
-htmle2html examples examples/html
+htmle2html examples/htmle out examples/html

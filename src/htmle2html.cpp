@@ -11,15 +11,42 @@
 #include <shellapi.h>
 #endif
 
-#define USAGE "Usage: htmle2html [htmle src directory] [Optional | html out directory]"
+#define USAGE "Usage: htmle2html [htmle src DIR | FILE] [html out DIR] [include files DIR]"
 
 namespace fs = std::filesystem;
 
+template<typename T>
+int exit_on_invalid_arg(T arg)
+{
+    if (not fs::exists(arg))
+    {
+        #ifdef WIN32
+        std::wcerr << "Invalid input provided, directory \"" << arg << "\" not found" << '\n'
+                    << USAGE << '\n';
+        #else
+        std::cerr << "Invalid input provided, directory \"" << arg << "\" not found" << '\n'
+                    << USAGE << '\n';
+        #endif
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
+}   
+
+int exit_on_not_directory(fs::path p)
+{
+    if (not fs::is_directory(p))
+    {
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
+}
+
+
 int main(int argc, char **argv)
 {
-    if (argc < 2)
+    if (argc < 4)
     {
-        std::cerr << "No input directory provided" << '\n'
+        std::cerr << "No enough arguments provided, expected 3 got " << argc - 1 << '\n'
                   << USAGE << '\n';
         return EXIT_FAILURE;
     }
@@ -28,77 +55,61 @@ int main(int argc, char **argv)
     LPWSTR cmd = GetCommandLineW();
     LPWSTR *argvw = CommandLineToArgvW(cmd, &argc);
     std::wstring src_arg(argvw[1]);
-    std::wstring out_arg = src_arg;
-    if (argc > 2)
-    {
-        out_arg = argvw[2];
-    }
-
+    std::wstring out_arg(argvw[2]);
+    std::wstring inc_arg(argvw[3]);
     #else
-    std::string src_arg = argv[1];
-    std::string out_arg = src_arg;
-    if (argc > 2)
-    {
-        out_arg = argv[2];
-    }
+    std::string src_arg(argv[1]);
+    std::string out_arg(argv[2]);
+    std::string inc_arg(argv[3]);
     #endif
 
-    if (not fs::exists(src_arg))
-    {
-        #ifdef WIN32
-        std::wcerr << "Invalid input provided, directory \"" << src_arg << "\" not found" << '\n'
-                   << USAGE << '\n';
-        #else
-        std::cerr << "Invalid input provided, directory \"" << src_arg << "\" not found" << '\n'
-                  << USAGE << '\n';
-        #endif
-        return EXIT_FAILURE;
-    }
 
-    if (not fs::exists(out_arg))
-    {
-        #ifdef WIN32
-        std::wcerr << "Invalid input provided, directory \"" << out_arg << "\" not found" << '\n'
-                   << USAGE << '\n';
-        #else
-        std::cerr << "Invalid input provided, directory \"" << out_arg << "\" not found" << '\n'
-                  << USAGE << '\n';
-        #endif
-        return EXIT_FAILURE;
-    }
+    int failure = exit_on_invalid_arg(src_arg) 
+                + exit_on_invalid_arg(out_arg) 
+                + exit_on_invalid_arg(inc_arg);
+    if (failure != EXIT_SUCCESS)
+        return failure;
+
 
     fs::path src_path = src_arg;
-    if (not fs::is_directory(src_path))
-    {
-        std::cerr << "Invalid input provided, file \"" << src_path.string() << "\" is not dir" << '\n'
-                  << USAGE << '\n';
-
-        return EXIT_FAILURE;
-    }
-    
     fs::path out_path = out_arg;
-    if (not fs::is_directory(out_path))
-    {
-        std::cerr << "Invalid input provided, file \"" << out_path.string() << "\" is not dir" << '\n'
-                  << USAGE << '\n';
-
-        return EXIT_FAILURE;
-    }
-
+    fs::path inc_path = inc_arg;
+    
     fs::path absolute_src_path = fs::absolute(src_path);
     fs::path absolute_out_path = fs::absolute(out_path);
+    fs::path absolute_inc_path = fs::absolute(inc_path);
+
+
+    failure = exit_on_not_directory(absolute_out_path)
+            + exit_on_not_directory(absolute_inc_path);
+    if (failure != EXIT_SUCCESS)
+        return failure;
+
 
     std::vector<fs::path> files;
-    for (auto const &dir_entry : fs::recursive_directory_iterator(absolute_src_path))
+    std::vector<fs::path> include_files;
+
+    if (fs::is_directory(absolute_src_path))
     {
-        files.push_back(dir_entry.path());
+        for (auto const &dir_entry : fs::recursive_directory_iterator(absolute_src_path))
+        {
+            fs::path p = dir_entry.path();
+            if (p.extension().compare(".htmle") == 0)
+                files.push_back(p);
+        }
+    } 
+    else
+    {
+        files.push_back(absolute_src_path);
     }
 
-    std::vector<fs::path> htmle_files;
-    std::copy_if(files.begin(), files.end(), std::back_inserter(htmle_files), [](fs::path i)
-                 { return i.extension().compare(".htmle") == 0; });
+    for (auto const &dir_entry : fs::recursive_directory_iterator(absolute_inc_path))
+    {
+        include_files.push_back(dir_entry.path());
+    }
 
-    for (auto const &s : htmle_files)
+
+    for (auto const &s : files)
     {
         fs::path new_file_path = absolute_out_path;
         new_file_path /= s.filename().replace_extension(".html");
@@ -180,7 +191,7 @@ int main(int argc, char **argv)
 
                 fs::path closest;
                 bool found_closest = false;
-                for (auto const &p : files)
+                for (auto const &p : include_files)
                 {
                     bool is_closest = is_valid_position(p.string().find(arg));
                     if (is_closest)
@@ -193,16 +204,16 @@ int main(int argc, char **argv)
 
                 if (not found_closest)
                 {
-                    std::cerr << "Error " << s.filename() << " " << line_position << ":" << e_begin_position << " include file " << arg << "not found" << '\n';
-                    out_file << "Error " << s.filename() << " " << line_position << ":" << e_begin_position << " include file " << arg << "not found" << '\n';
+                    std::cerr << "Error " << s.filename() << " " << line_position << ":" << e_begin_position << " include file " << arg << " not found" << '\n';
+                    out_file << "Error " << s.filename() << " " << line_position << ":" << e_begin_position << " include file " << arg << " not found" << '\n';
                     continue;
                 }
 
                 std::ifstream include_file(closest);
                 if (not include_file.is_open())
                 {
-                    std::cerr << "Error " << s.filename() << " " << line_position << ":" << e_begin_position << " include file " << arg << "cant open" << '\n';
-                    out_file << "Error " << s.filename() << " " << line_position << ":" << e_begin_position << " include file " << arg << "cant open" << '\n';
+                    std::cerr << "Error " << s.filename() << " " << line_position << ":" << e_begin_position << " include file " << arg << " cant open" << '\n';
+                    out_file << "Error " << s.filename() << " " << line_position << ":" << e_begin_position << " include file " << arg << " cant open" << '\n';
                     continue;
                 }
 
