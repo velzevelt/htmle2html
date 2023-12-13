@@ -108,7 +108,7 @@ int main(int argc, char **argv)
             if (has_begin and not has_end)
             {
                 std::cerr << "Syntax Error " << s.filename() << " " << line_position << ":" << e_begin_position << " missing ?>" << '\n';
-                out_file  << "Syntax Error " << line_position << ":" << e_begin_position << " missing ?>" << '\n';
+                out_file << "Syntax Error " << line_position << ":" << e_begin_position << " missing ?>" << '\n';
                 continue;
             }
 
@@ -124,10 +124,53 @@ int main(int argc, char **argv)
                 if (not has_arg)
                 {
                     std::cerr << "Error " << s.filename() << " " << line_position << ":" << e_begin_position << " include(\"\") missing argument" << '\n';
-                    out_file  << "Error " << line_position << ":" << e_begin_position << " include(\"\") missing argument" << '\n';
+                    out_file << "Error " << line_position << ":" << e_begin_position << " include(\"\") missing argument" << '\n';
                     continue;
                 }
 
+                arg_begin_position += 2;
+                arg_end_position--;
+
+                int distance = arg_end_position - arg_begin_position + 1;
+                std::string arg = line.substr(arg_begin_position, distance);
+
+                fs::path closest;
+                bool found_closest = false;
+                for (auto const &p : files)
+                {
+                    bool is_closest = p.filename().compare(arg) == 0;
+                    if (is_closest)
+                    {
+                        closest = p;
+                        found_closest = true;
+                        std::cout << "ARG S " << p << "\n";
+                        break;
+                    }
+                }
+
+                if (not found_closest)
+                {
+                    std::cerr << "Error " << s.filename() << " " << line_position << ":" << e_begin_position << " include file " << arg << "not found" << '\n';
+                    out_file << "Error " << s.filename() << " " << line_position << ":" << e_begin_position << " include file " << arg << "not found" << '\n';
+                    continue;
+                }
+                
+
+                std::ifstream include_file(closest);
+                if (not include_file.is_open())
+                {
+                    std::cerr << "Error " << s.filename() << " " << line_position << ":" << e_begin_position << " include file " << arg << "cant open" << '\n';
+                    out_file << "Error " << s.filename() << " " << line_position << ":" << e_begin_position << " include file " << arg << "cant open" << '\n';
+                    continue;
+                }
+
+                std::string l;
+                while (std::getline(include_file, l))
+                {
+                    out_file << l << '\n';
+                }
+                include_file.close();
+                continue;
             }
 
             out_file << out << '\n';
