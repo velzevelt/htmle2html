@@ -143,7 +143,6 @@ int main(int argc, char **argv)
                     {
                         closest = p;
                         found_closest = true;
-                        std::cout << "ARG S " << p << "\n";
                         break;
                     }
                 }
