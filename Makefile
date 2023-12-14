@@ -18,4 +18,5 @@ windows-cygwin-release:
 	gcc -I ./src/ ./src/htmle2html.c -o ./bin/htmle2html -Wall -Wextra -O2
 
 
-# windows-mingw:
+windows-mingw-release:
+	mingw32-g++ -I ./src/ ./src/htmle2html.cpp -o ./bin/htmle2html -Wall -Wextra -O3 -static -DWIN32

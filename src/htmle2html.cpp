@@ -187,13 +187,15 @@ int main(int argc, char **argv)
                 arg_end_position--;
 
                 int distance = arg_end_position - arg_begin_position + 1;
-                std::string arg = line.substr(arg_begin_position, distance);
+                fs::path arg = line.substr(arg_begin_position, distance);
+                arg.make_preferred();
+
 
                 fs::path closest;
                 bool found_closest = false;
                 for (auto const &p : include_files)
                 {
-                    bool is_closest = is_valid_position(p.string().find(arg));
+                    bool is_closest = is_valid_position(p.string().find(arg.string()));
                     if (is_closest)
                     {
                         closest = p;
